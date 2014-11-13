@@ -3,8 +3,8 @@ package microsoft
 import "github.com/st3v/translator"
 
 type api struct {
-	clientId     string `json:"client_id"`
-	clientSecret string `json:"client_secret"`
+	clientId     string
+	clientSecret string
 }
 
 func NewTranslator(clientId, clientSecret string) translator.Translator {
