@@ -1,8 +1,8 @@
 package translator
 
 type Language struct {
-	code string
-	name string
+	Code string
+	Name string
 }
 
 type Translator interface {
