@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	translator := microsoft.NewTranslator("globe", "gQwodqYqfffKHRCh/3iudM7k/7I0JoqcvSc8fH4Dpf0=")
+	translator := microsoft.NewTranslator("client-id", "client-secret")
 	fmt.Println(translator.Translate("Hello World!", "en", "de"))
 }
