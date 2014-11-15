@@ -10,10 +10,7 @@ import (
 	"time"
 )
 
-const (
-	SCOPE    = "http://api.microsofttranslator.com"
-	AUTH_URL = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-)
+const scope = "http://api.microsofttranslator.com"
 
 type Authenticator interface {
 	Authenticate(request *http.Request) error
@@ -22,6 +19,7 @@ type Authenticator interface {
 type authenticator struct {
 	clientId     string
 	clientSecret string
+	authUrl      string
 	accessToken  *accessToken
 }
 
@@ -52,21 +50,21 @@ func (a *authenticator) Authenticate(request *http.Request) error {
 
 func (a *authenticator) authToken() (string, error) {
 	if a.accessToken == nil || a.accessToken.expired() {
-		if err := a.requestAccessToken(AUTH_URL); err != nil {
+		if err := a.requestAccessToken(); err != nil {
 			return "", err
 		}
 	}
 	return "Bearer " + a.accessToken.Token, nil
 }
 
-func (a *authenticator) requestAccessToken(authUrl string) error {
+func (a *authenticator) requestAccessToken() error {
 	values := make(url.Values)
 	values.Set("client_id", a.clientId)
 	values.Set("client_secret", a.clientSecret)
-	values.Set("scope", SCOPE)
+	values.Set("scope", scope)
 	values.Set("grant_type", "client_credentials")
 
-	response, err := http.PostForm(authUrl, values)
+	response, err := http.PostForm(a.authUrl, values)
 	if err != nil {
 		log.Println(err)
 		return err

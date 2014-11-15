@@ -15,7 +15,7 @@ func TestRequestAccessToken(t *testing.T) {
 	clientId := "foobar"
 	clientSecret := "private"
 
-	accessToken := fakeAccessToken(100)
+	accessToken := NewMockAccessToken(100)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -28,7 +28,7 @@ func TestRequestAccessToken(t *testing.T) {
 			t.Fatalf("Unexpected client_secret '%s' in post request.", r.PostFormValue("client_secret"))
 		}
 
-		if r.PostFormValue("scope") != SCOPE {
+		if r.PostFormValue("scope") != scope {
 			t.Fatalf("Unexpected scope '%s' in post request.", r.PostFormValue("scope"))
 		}
 
@@ -49,9 +49,10 @@ func TestRequestAccessToken(t *testing.T) {
 	authenticator := &authenticator{
 		clientId:     clientId,
 		clientSecret: clientSecret,
+		authUrl:      server.URL,
 	}
 
-	err := authenticator.requestAccessToken(server.URL)
+	err := authenticator.requestAccessToken()
 
 	if err != nil {
 		t.Fatalf("Unexpected error returned by requestAccessToken: %s", err)
@@ -82,12 +83,12 @@ func TestRequestAccessToken(t *testing.T) {
 
 // Make sure the access token expires as expected.
 func TestExpired(t *testing.T) {
-	accessToken := fakeAccessToken(12)
+	accessToken := NewMockAccessToken(12)
 	if accessToken.expired() {
 		t.Fatalf("Access token should not have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
 	}
 
-	accessToken = fakeAccessToken(0)
+	accessToken = NewMockAccessToken(0)
 	if !accessToken.expired() {
 		t.Fatalf("Access token should have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
 	}
@@ -98,7 +99,7 @@ func TestAuthToken(t *testing.T) {
 	authenticator := &authenticator{
 		clientId:     "clientId",
 		clientSecret: "clientSecret",
-		accessToken:  fakeAccessToken(100),
+		accessToken:  NewMockAccessToken(100),
 	}
 
 	authToken, err := authenticator.authToken()
@@ -116,7 +117,7 @@ func TestAuthenticate(t *testing.T) {
 	authenticator := &authenticator{
 		clientId:     "clientId",
 		clientSecret: "clientSecret",
-		accessToken:  fakeAccessToken(100),
+		accessToken:  NewMockAccessToken(100),
 	}
 
 	authToken, err := authenticator.authToken()
@@ -137,15 +138,5 @@ func TestAuthenticate(t *testing.T) {
 
 	if r.Header.Get("Authorization") != authToken {
 		t.Fatalf("Unexpected authorization header. Header: ", r.Header.Get("Authorization"))
-	}
-}
-
-func fakeAccessToken(expiresIn int) *accessToken {
-	return &accessToken{
-		Token:     "token",
-		Type:      "token_type",
-		Scope:     "token_scope",
-		ExpiresIn: fmt.Sprintf("%d", expiresIn),
-		ExpiresAt: time.Now().Add(time.Duration(expiresIn) * time.Second),
 	}
 }

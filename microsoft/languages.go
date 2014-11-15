@@ -8,11 +8,6 @@ import (
 	"github.com/st3v/translator"
 )
 
-const (
-	languageCodesEndpoint = serviceUri + "GetLanguagesForTranslate"
-	languageNamesEndpoint = serviceUri + "GetLanguageNames"
-)
-
 func (a *api) Languages() ([]translator.Language, error) {
 	if a.languages == nil {
 		codes, err := a.languageCodes()
@@ -40,7 +35,7 @@ func (a *api) Languages() ([]translator.Language, error) {
 // Return a list of language names that correspond to a given list of language codes.
 func (a *api) languageNames(codes []string) ([]string, error) {
 	payload, _ := xml.Marshal(newArrayOfStrings(codes))
-	uri := languageNamesEndpoint + "?locale=en"
+	uri := a.router.LanguageNamesUrl() + "?locale=en"
 
 	response, err := a.sendRequest("POST", uri, strings.NewReader(string(payload)), "text/xml")
 	if err != nil {
@@ -63,7 +58,7 @@ func (a *api) languageNames(codes []string) ([]string, error) {
 
 // Return a list of language codes supported by the API.
 func (a *api) languageCodes() ([]string, error) {
-	response, err := a.sendRequest("GET", languageCodesEndpoint, nil, "text/plain")
+	response, err := a.sendRequest("GET", a.router.LanguageCodesUrl(), nil, "text/plain")
 	if err != nil {
 		return nil, err
 	}

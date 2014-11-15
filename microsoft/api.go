@@ -9,17 +9,14 @@ import (
 
 type api struct {
 	authenticator Authenticator
+	router        Router
 	languages     []translator.Language
 }
-
-const (
-	serviceUri          = "http://api.microsofttranslator.com/v2/Http.svc/"
-	translationEndpoint = serviceUri + "Translate"
-)
 
 func NewTranslator(clientId, clientSecret string) translator.Translator {
 	return &api{
 		authenticator: NewAuthenticator(clientId, clientSecret),
+		router:        NewRouter(),
 	}
 }
 
