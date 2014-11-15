@@ -3,14 +3,12 @@ package microsoft
 import "github.com/st3v/translator"
 
 type api struct {
-	clientId     string
-	clientSecret string
+	authenticator Authenticator
 }
 
 func NewTranslator(clientId, clientSecret string) translator.Translator {
 	return &api{
-		clientId:     clientId,
-		clientSecret: clientSecret,
+		authenticator: NewAuthenticator(clientId, clientSecret),
 	}
 }
 
