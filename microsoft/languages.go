@@ -8,16 +8,29 @@ import (
 	"github.com/st3v/translator"
 )
 
+type LanguageCatalog interface {
+	Languages() ([]translator.Language, error)
+}
+
 type LanguageProvider interface {
 	Codes() ([]string, error)
 	Names(codes []string) ([]string, error)
-	Languages() ([]translator.Language, error)
+}
+
+type languageCatalog struct {
+	provider  LanguageProvider
+	languages []translator.Language
 }
 
 type languageProvider struct {
 	router     Router
 	httpClient HttpClient
-	languages  []translator.Language
+}
+
+func newLanguageCatalog(provider LanguageProvider) LanguageCatalog {
+	return &languageCatalog{
+		provider: provider,
+	}
 }
 
 func newLanguageProvider(authenticator Authenticator) LanguageProvider {
@@ -27,28 +40,28 @@ func newLanguageProvider(authenticator Authenticator) LanguageProvider {
 	}
 }
 
-func (p *languageProvider) Languages() ([]translator.Language, error) {
-	if p.languages == nil {
-		codes, err := p.Codes()
+func (c *languageCatalog) Languages() ([]translator.Language, error) {
+	if c.languages == nil {
+		codes, err := c.provider.Codes()
 		if err != nil {
 			return nil, err
 		}
 
-		names, err := p.Names(codes)
+		names, err := c.provider.Names(codes)
 		if err != nil {
 			return nil, err
 		}
 
 		for i := range codes {
-			p.languages = append(
-				p.languages,
+			c.languages = append(
+				c.languages,
 				translator.Language{
 					Code: codes[i],
 					Name: names[i],
 				})
 		}
 	}
-	return p.languages, nil
+	return c.languages, nil
 }
 
 func (p *languageProvider) Names(codes []string) ([]string, error) {

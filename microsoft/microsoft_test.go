@@ -21,6 +21,30 @@ func newMockAuthenticator(token *accessToken) *authenticator {
 	}
 }
 
+func newMockLanguageProvider() *mockLanguageProvider {
+	return &mockLanguageProvider{
+		callCounter: make(map[string]int),
+		codes:       make([]string, 0),
+		names:       make([]string, 0),
+	}
+}
+
+type mockLanguageProvider struct {
+	callCounter map[string]int
+	codes       []string
+	names       []string
+}
+
+func (p *mockLanguageProvider) Codes() ([]string, error) {
+	p.callCounter["Codes"]++
+	return p.codes, nil
+}
+
+func (p *mockLanguageProvider) Names(codes []string) ([]string, error) {
+	p.callCounter["Names"]++
+	return p.names, nil
+}
+
 func newMockRouter() *mockRouter {
 	return &mockRouter{
 		authUrl:          "auth",

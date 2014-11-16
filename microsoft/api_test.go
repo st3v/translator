@@ -38,7 +38,7 @@ func TestApiLanguages(t *testing.T) {
 	}
 
 	api := &api{
-		languageProvider: &languageProvider{
+		languageCatalog: &languageCatalog{
 			languages: expectedLanguages,
 		},
 	}
