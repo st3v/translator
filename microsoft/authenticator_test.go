@@ -11,11 +11,11 @@ import (
 
 // Make sure function requestAccessToken sends the expected request to the server
 // and is able to generate a valid access token from the server's response.
-func TestRequestAccessToken(t *testing.T) {
+func TestAuthenticatorRequestAccessToken(t *testing.T) {
 	clientId := "foobar"
 	clientSecret := "private"
 
-	accessToken := NewMockAccessToken(100)
+	accessToken := newMockAccessToken(100)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
@@ -50,10 +50,13 @@ func TestRequestAccessToken(t *testing.T) {
 	}))
 	defer server.Close()
 
+	router := newMockRouter()
+	router.authUrl = server.URL
+
 	authenticator := &authenticator{
 		clientId:     clientId,
 		clientSecret: clientSecret,
-		authUrl:      server.URL,
+		router:       router,
 	}
 
 	err := authenticator.requestAccessToken()
@@ -86,24 +89,24 @@ func TestRequestAccessToken(t *testing.T) {
 }
 
 // Make sure the access token expires as expected.
-func TestExpired(t *testing.T) {
-	accessToken := NewMockAccessToken(12)
+func TestAuthenticatorExpired(t *testing.T) {
+	accessToken := newMockAccessToken(12)
 	if accessToken.expired() {
 		t.Fatalf("Access token should not have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
 	}
 
-	accessToken = NewMockAccessToken(0)
+	accessToken = newMockAccessToken(0)
 	if !accessToken.expired() {
 		t.Fatalf("Access token should have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
 	}
 }
 
 // Make sure a valid authToken is being generated from a given access token.
-func TestAuthToken(t *testing.T) {
+func TestAuthenticatorAuthToken(t *testing.T) {
 	authenticator := &authenticator{
 		clientId:     "clientId",
 		clientSecret: "clientSecret",
-		accessToken:  NewMockAccessToken(100),
+		accessToken:  newMockAccessToken(100),
 	}
 
 	authToken, err := authenticator.authToken()
@@ -117,11 +120,11 @@ func TestAuthToken(t *testing.T) {
 }
 
 // Make sure Authenticate() correctly sets the authrorization header of a given request.
-func TestAuthenticate(t *testing.T) {
+func TestAuthenticatorAuthenticate(t *testing.T) {
 	authenticator := &authenticator{
 		clientId:     "clientId",
 		clientSecret: "clientSecret",
-		accessToken:  NewMockAccessToken(100),
+		accessToken:  newMockAccessToken(100),
 	}
 
 	authToken, err := authenticator.authToken()

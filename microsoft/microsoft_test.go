@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func NewMockAccessToken(expiresIn int) *accessToken {
+func newMockAccessToken(expiresIn int) *accessToken {
 	return &accessToken{
 		Token:     "token",
 		Type:      "token_type",
@@ -16,18 +16,13 @@ func NewMockAccessToken(expiresIn int) *accessToken {
 	}
 }
 
-func NewMockApi() *api {
-	return &api{
-		authenticator: NewMockAuthenticator(),
-		router:        NewMockRouter(),
+func newMockAuthenticator(token *accessToken) *authenticator {
+	return &authenticator{
+		accessToken: token,
 	}
 }
 
-func NewMockAuthenticator() *authenticator {
-	return &authenticator{}
-}
-
-func NewMockRouter() *mockRouter {
+func newMockRouter() *mockRouter {
 	return &mockRouter{
 		authUrl:          "auth",
 		translationUrl:   "translation",
@@ -66,19 +61,3 @@ func (m *mockRouter) LanguageNamesUrl() string {
 func (m *mockRouter) LanguageCodesUrl() string {
 	return m.languageCodesUrl
 }
-
-// func (m *mockRouter) SetAuthUrl(url string) {
-// 	m.authUrl = url
-// }
-
-// func (m *mockRouter) SetTranslationUrl(url string) {
-// 	m.translationUrl = url
-// }
-
-// func (m *mockRouter) SetLanguageNamesUrl(url string) {
-// 	m.languageNamesUrl = url
-// }
-
-// func (m *mockRouter) SeLanguageCodesUrl(url string) {
-// 	m.languageCodesUrl = url
-// }

@@ -13,6 +13,6 @@ func TestTranslate(t *testing.T) {
 	}
 
 	if translation != "" {
-		t.Errorf("Unexpected transaltion: %s", translation)
+		t.Errorf("Unexpected translation: %s", translation)
 	}
 }

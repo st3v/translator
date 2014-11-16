@@ -9,11 +9,10 @@ import (
 	"testing"
 )
 
-func TestLanguageCodes(t *testing.T) {
+func TestLanguageProviderCodes(t *testing.T) {
 	expectedCodes := []string{"en", "de", "es", "ru", "jp"}
 
-	authenticator := NewMockAuthenticator()
-	authenticator.accessToken = NewMockAccessToken(100)
+	authenticator := newMockAuthenticator(newMockAccessToken(100))
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -40,14 +39,15 @@ func TestLanguageCodes(t *testing.T) {
 	}))
 	defer server.Close()
 
-	router := NewMockRouter()
+	router := newMockRouter()
 	router.languageCodesUrl = server.URL
 
-	api := NewMockApi()
-	api.router = router
-	api.authenticator = authenticator
+	languageProvider := &languageProvider{
+		router:     router,
+		httpClient: newHttpClient(authenticator),
+	}
 
-	actualCodes, err := api.languageCodes()
+	actualCodes, err := languageProvider.Codes()
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err)
 	}
@@ -63,12 +63,11 @@ func TestLanguageCodes(t *testing.T) {
 	}
 }
 
-func TestLanguageNames(t *testing.T) {
+func TestLanguageProviderNames(t *testing.T) {
 	expectedCodes := []string{"en", "de", "es", "ru", "jp"}
 	expectedNames := []string{"English", "German", "Spanish", "Russian", "Japanese"}
 
-	authenticator := NewMockAuthenticator()
-	authenticator.accessToken = NewMockAccessToken(100)
+	authenticator := newMockAuthenticator(newMockAccessToken(100))
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
@@ -116,14 +115,15 @@ func TestLanguageNames(t *testing.T) {
 	}))
 	defer server.Close()
 
-	router := NewMockRouter()
+	router := newMockRouter()
 	router.languageNamesUrl = server.URL
 
-	api := NewMockApi()
-	api.router = router
-	api.authenticator = authenticator
+	languageProvider := &languageProvider{
+		router:     router,
+		httpClient: newHttpClient(authenticator),
+	}
 
-	actualNames, err := api.languageNames(expectedCodes)
+	actualNames, err := languageProvider.Names(expectedCodes)
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err)
 	}

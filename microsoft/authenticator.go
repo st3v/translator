@@ -19,7 +19,7 @@ type Authenticator interface {
 type authenticator struct {
 	clientId     string
 	clientSecret string
-	authUrl      string
+	router       Router
 	accessToken  *accessToken
 }
 
@@ -31,10 +31,11 @@ type accessToken struct {
 	ExpiresAt time.Time
 }
 
-func NewAuthenticator(clientId, clientSecret string) Authenticator {
+func newAuthenticator(clientId, clientSecret string) Authenticator {
 	return &authenticator{
 		clientId:     clientId,
 		clientSecret: clientSecret,
+		router:       newRouter(),
 	}
 }
 
@@ -64,7 +65,7 @@ func (a *authenticator) requestAccessToken() error {
 	values.Set("scope", scope)
 	values.Set("grant_type", "client_credentials")
 
-	response, err := http.PostForm(a.authUrl, values)
+	response, err := http.PostForm(a.router.AuthUrl(), values)
 	if err != nil {
 		log.Println(err)
 		return err

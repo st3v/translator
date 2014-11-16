@@ -17,7 +17,7 @@ type Router interface {
 
 type router struct{}
 
-func NewRouter() Router {
+func newRouter() Router {
 	return &router{}
 }
 

@@ -8,36 +8,54 @@ import (
 	"github.com/st3v/translator"
 )
 
-func (a *api) Languages() ([]translator.Language, error) {
-	if a.languages == nil {
-		codes, err := a.languageCodes()
+type LanguageProvider interface {
+	Codes() ([]string, error)
+	Names(codes []string) ([]string, error)
+	Languages() ([]translator.Language, error)
+}
+
+type languageProvider struct {
+	router     Router
+	httpClient HttpClient
+	languages  []translator.Language
+}
+
+func newLanguageProvider(authenticator Authenticator) LanguageProvider {
+	return &languageProvider{
+		router:     newRouter(),
+		httpClient: newHttpClient(authenticator),
+	}
+}
+
+func (p *languageProvider) Languages() ([]translator.Language, error) {
+	if p.languages == nil {
+		codes, err := p.Codes()
 		if err != nil {
 			return nil, err
 		}
 
-		names, err := a.languageNames(codes)
+		names, err := p.Names(codes)
 		if err != nil {
 			return nil, err
 		}
 
 		for i := range codes {
-			a.languages = append(
-				a.languages,
+			p.languages = append(
+				p.languages,
 				translator.Language{
 					Code: codes[i],
 					Name: names[i],
 				})
 		}
 	}
-	return a.languages, nil
+	return p.languages, nil
 }
 
-// Return a list of language names that correspond to a given list of language codes.
-func (a *api) languageNames(codes []string) ([]string, error) {
+func (p *languageProvider) Names(codes []string) ([]string, error) {
 	payload, _ := xml.Marshal(newArrayOfStrings(codes))
-	uri := a.router.LanguageNamesUrl() + "?locale=en"
+	uri := p.router.LanguageNamesUrl() + "?locale=en"
 
-	response, err := a.sendRequest("POST", uri, strings.NewReader(string(payload)), "text/xml")
+	response, err := p.httpClient.SendRequest("POST", uri, strings.NewReader(string(payload)), "text/xml")
 	if err != nil {
 		return nil, err
 	}
@@ -56,9 +74,8 @@ func (a *api) languageNames(codes []string) ([]string, error) {
 	return result.Strings, nil
 }
 
-// Return a list of language codes supported by the API.
-func (a *api) languageCodes() ([]string, error) {
-	response, err := a.sendRequest("GET", a.router.LanguageCodesUrl(), nil, "text/plain")
+func (p *languageProvider) Codes() ([]string, error) {
+	response, err := p.httpClient.SendRequest("GET", p.router.LanguageCodesUrl(), nil, "text/plain")
 	if err != nil {
 		return nil, err
 	}
