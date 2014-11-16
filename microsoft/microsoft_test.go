@@ -2,7 +2,6 @@ package microsoft
 
 import (
 	"fmt"
-	"testing"
 	"time"
 )
 
@@ -29,14 +28,6 @@ func newMockRouter() *mockRouter {
 		languageNamesUrl: "languages_names",
 		languageCodesUrl: "languages_codes",
 	}
-}
-
-func (a *authenticator) expectedAuthToken(t *testing.T) string {
-	token, err := a.authToken()
-	if err != nil {
-		t.Fatalf("Unexpected error getting authToken from authenticator: %s", err)
-	}
-	return token
 }
 
 type mockRouter struct {
