@@ -29,11 +29,11 @@ func TestApiLanguages(t *testing.T) {
 		},
 		translator.Language{
 			Code: "de",
-			Name: "Spanish",
+			Name: "German",
 		},
 		translator.Language{
-			Code: "en",
-			Name: "English",
+			Code: "es",
+			Name: "Spanish",
 		},
 	}
 
