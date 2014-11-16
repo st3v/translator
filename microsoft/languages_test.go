@@ -11,8 +11,24 @@ import (
 func TestLanguageCodes(t *testing.T) {
 	expectedCodes := []string{"ab", "cd", "ef", "gh", "ij"}
 
+	authenticator := NewMockAuthenticator()
+	authenticator.accessToken = NewMockAccessToken(100)
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/xml")
+
+		if r.Header.Get("Content-Type") != "text/plain" {
+			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
+		}
+
+		expectedAuthToken, err := authenticator.authToken()
+		if err != nil {
+			t.Fatalf("Unexpected error getting expected authToken: %s", err)
+		}
+
+		if r.Header.Get("Authorization") != expectedAuthToken {
+			t.Fatalf("Unexpected authorization header for request: %s", r.Header.Get("Authorization"))
+		}
 
 		response, err := xml.Marshal(newArrayOfStrings(expectedCodes))
 		if err != nil {
@@ -23,9 +39,6 @@ func TestLanguageCodes(t *testing.T) {
 		return
 	}))
 	defer server.Close()
-
-	authenticator := NewMockAuthenticator()
-	authenticator.accessToken = NewMockAccessToken(100)
 
 	router := NewMockRouter()
 	router.languageCodesUrl = server.URL
