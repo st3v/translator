@@ -18,7 +18,9 @@ func TestRequestAccessToken(t *testing.T) {
 	accessToken := NewMockAccessToken(100)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+		if r.Method != "POST" {
+			t.Fatalf("Unexpected request method: %s", r.Method)
+		}
 
 		if r.PostFormValue("client_id") != clientId {
 			t.Fatalf("Unexpected client_id '%s' in post request.", r.PostFormValue("client_id"))
@@ -40,6 +42,8 @@ func TestRequestAccessToken(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling json repsonse: %s", err)
 		}
+
+		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Fprint(w, string(response))
 		return
