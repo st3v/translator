@@ -65,7 +65,7 @@ func (c *languageCatalog) Languages() ([]translator.Language, error) {
 }
 
 func (p *languageProvider) Names(codes []string) ([]string, error) {
-	payload, _ := xml.Marshal(newArrayOfStrings(codes))
+	payload, _ := xml.Marshal(newXmlArrayOfStrings(codes))
 	uri := p.router.LanguageNamesUrl() + "?locale=en"
 
 	response, err := p.httpClient.SendRequest("POST", uri, strings.NewReader(string(payload)), "text/xml")
@@ -79,7 +79,7 @@ func (p *languageProvider) Names(codes []string) ([]string, error) {
 		return nil, err
 	}
 
-	result := &arrayOfStrings{}
+	result := &xmlArrayOfStrings{}
 	if err := xml.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (p *languageProvider) Codes() ([]string, error) {
 		return nil, err
 	}
 
-	result := &arrayOfStrings{}
+	result := &xmlArrayOfStrings{}
 	if err = xml.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}

@@ -27,7 +27,7 @@ func TestLanguageProviderCodes(t *testing.T) {
 			t.Fatalf("Unexpected authorization header for request: %s", r.Header.Get("Authorization"))
 		}
 
-		response, err := xml.Marshal(newArrayOfStrings(expectedCodes))
+		response, err := xml.Marshal(newXmlArrayOfStrings(expectedCodes))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err)
 		}
@@ -88,7 +88,7 @@ func TestLanguageProviderNames(t *testing.T) {
 			t.Fatalf("Unexpected error reading request body: %s", err)
 		}
 
-		actualCodes := &arrayOfStrings{}
+		actualCodes := &xmlArrayOfStrings{}
 		if err := xml.Unmarshal(body, &actualCodes); err != nil {
 			t.Fatalf("Unexpected error unmarshalling xml request body: %s", err)
 		}
@@ -103,7 +103,7 @@ func TestLanguageProviderNames(t *testing.T) {
 			}
 		}
 
-		response, err := xml.Marshal(newArrayOfStrings(expectedNames))
+		response, err := xml.Marshal(newXmlArrayOfStrings(expectedNames))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err)
 		}

@@ -24,7 +24,12 @@ func newTranslationProvider(authenticator Authenticator) TranslationProvider {
 }
 
 func (p *translationProvider) Translate(text, from, to string) (string, error) {
-	uri := fmt.Sprintf("%s?text=%s&from=%s&to=%s", p.router.TranslationUrl(), url.QueryEscape(text), from, to)
+	uri := fmt.Sprintf(
+		"%s?text=%s&from=%s&to=%s",
+		p.router.TranslationUrl(),
+		url.QueryEscape(text),
+		url.QueryEscape(from),
+		url.QueryEscape(to))
 
 	response, err := p.httpClient.SendRequest("GET", uri, nil, "text/plain")
 	if err != nil {
@@ -37,11 +42,11 @@ func (p *translationProvider) Translate(text, from, to string) (string, error) {
 		return "", err
 	}
 
-	var translation string
+	translation := &xmlString{}
 	err = xml.Unmarshal(body, &translation)
 	if err != nil {
 		return "", err
 	}
 
-	return translation, nil
+	return translation.Value, nil
 }
