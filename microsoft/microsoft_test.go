@@ -2,6 +2,7 @@ package microsoft
 
 import (
 	"fmt"
+	"testing"
 	"time"
 )
 
@@ -43,6 +44,39 @@ func (p *mockLanguageProvider) Codes() ([]string, error) {
 func (p *mockLanguageProvider) Names(codes []string) ([]string, error) {
 	p.callCounter["Names"]++
 	return p.names, nil
+}
+
+func newMockTranslationProvider(text, from, to, translation string, t *testing.T) *mockTranslationProvider {
+	return &mockTranslationProvider{
+		text:        text,
+		from:        from,
+		to:          to,
+		translation: translation,
+		t:           t,
+	}
+}
+
+type mockTranslationProvider struct {
+	text        string
+	from        string
+	to          string
+	translation string
+	t           *testing.T
+}
+
+func (p *mockTranslationProvider) Translate(text, from, to string) (string, error) {
+	if p.text != text {
+		p.t.Fatalf("Unexpected text value: `%s`", text)
+	}
+
+	if p.from != from {
+		p.t.Fatalf("Unexpected from value: `%s`", from)
+	}
+
+	if p.to != to {
+		p.t.Fatalf("Unexpected to value: `%s`", to)
+	}
+	return p.translation, nil
 }
 
 func newMockRouter() *mockRouter {

@@ -6,20 +6,25 @@ import (
 	"github.com/st3v/translator"
 )
 
-// func TestTranslate(t *testing.T) {
-// 	api := NewTranslator("", "")
+func TestTranslate(t *testing.T) {
+	original := "Mein Englisch ist unter aller Sau."
+	expectedTranslation := "My English is under all pig."
+	from := "de"
+	to := "en"
 
-// 	original := "dog"
-// 	translation, err := api.Translate(original, "en", "de")
+	api := &api{
+		translationProvider: newMockTranslationProvider(original, from, to, expectedTranslation, t),
+	}
 
-// 	if err != nil {
-// 		t.Errorf("Unexpected error: %s", err)
-// 	}
+	actualTranslation, err := api.Translate(original, from, to)
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+	}
 
-// 	if translation != "" {
-// 		t.Errorf("Unexpected translation: %s", translation)
-// 	}
-// }
+	if actualTranslation != expectedTranslation {
+		t.Errorf("Unexpected translation: %s", actualTranslation)
+	}
+}
 
 func TestApiLanguages(t *testing.T) {
 	expectedLanguages := []translator.Language{
