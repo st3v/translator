@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -17,6 +18,7 @@ type Authenticator interface {
 }
 
 type authenticator struct {
+	mutex        sync.Mutex
 	clientId     string
 	clientSecret string
 	router       Router
@@ -50,6 +52,9 @@ func (a *authenticator) Authenticate(request *http.Request) error {
 }
 
 func (a *authenticator) authToken() (string, error) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
 	if a.accessToken == nil || a.accessToken.expired() {
 		if err := a.requestAccessToken(); err != nil {
 			return "", err
