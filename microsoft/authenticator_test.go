@@ -113,7 +113,7 @@ func TestAuthenticatorAuthToken(t *testing.T) {
 
 	expectedToken := <-authenticator.accessTokenChan
 	if authToken != fmt.Sprintf("Bearer %s", expectedToken.Token) {
-		t.Fatalf("Invalid authToken ''.", authToken)
+		t.Fatalf("Invalid authToken '%s'.", authToken)
 	}
 }
 
@@ -132,13 +132,13 @@ func TestAuthenticatorAuthenticate(t *testing.T) {
 	}
 
 	if r.Header.Get("Authorization") != "" {
-		t.Fatalf("Authorization header should not haven been set. Header: ", r.Header.Get("Authorization"))
+		t.Fatalf("Authorization header should not haven been set. Header: %s", r.Header.Get("Authorization"))
 	}
 
 	authenticator.Authenticate(r)
 
 	if r.Header.Get("Authorization") != authToken {
-		t.Fatalf("Unexpected authorization header. Header: ", r.Header.Get("Authorization"))
+		t.Fatalf("Unexpected authorization header. Header: %s", r.Header.Get("Authorization"))
 	}
 }
 
