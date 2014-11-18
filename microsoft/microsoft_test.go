@@ -17,8 +17,13 @@ func newMockAccessToken(expiresIn int) *accessToken {
 }
 
 func newMockAuthenticator(token *accessToken) *authenticator {
+	// make buffered accessToken channel an pre-fill it with nil
+	tokenChan := make(chan *accessToken, 1)
+	tokenChan <- token
+
+	// return new authenticator that uses the above accessToken channel
 	return &authenticator{
-		accessToken: token,
+		accessTokenChan: tokenChan,
 	}
 }
 

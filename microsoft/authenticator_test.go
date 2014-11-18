@@ -11,11 +11,11 @@ import (
 
 // Make sure function requestAccessToken sends the expected request to the server
 // and is able to generate a valid access token from the server's response.
-func TestAuthenticatorRequestAccessToken(t *testing.T) {
+func TestAuthenticatorRefreshAccessToken(t *testing.T) {
 	clientId := "foobar"
 	clientSecret := "private"
 
-	accessToken := newMockAccessToken(100)
+	expectedToken := newMockAccessToken(100)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
@@ -38,7 +38,7 @@ func TestAuthenticatorRequestAccessToken(t *testing.T) {
 			t.Fatalf("Unexpected grant_type '%s' in post request.", r.PostFormValue("grant_type"))
 		}
 
-		response, err := json.Marshal(accessToken)
+		response, err := json.Marshal(expectedToken)
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling json repsonse: %s", err)
 		}
@@ -53,43 +53,42 @@ func TestAuthenticatorRequestAccessToken(t *testing.T) {
 	router := newMockRouter()
 	router.authUrl = server.URL
 
-	authenticator := &authenticator{
+	authenticationProvider := &authenticationProvider{
 		clientId:     clientId,
 		clientSecret: clientSecret,
 		router:       router,
 	}
 
-	err := authenticator.requestAccessToken()
-
-	if err != nil {
+	actualToken := &accessToken{}
+	if err := authenticationProvider.RefreshAccessToken(actualToken); err != nil {
 		t.Fatalf("Unexpected error returned by requestAccessToken: %s", err)
 	}
 
-	if authenticator.accessToken.Token != accessToken.Token {
-		t.Fatalf("Unexpected Token '%s' in access token generated from http response.", authenticator.accessToken.Token)
+	if actualToken.Token != expectedToken.Token {
+		t.Fatalf("Unexpected Token '%s' in access token generated from http response.", actualToken.Token)
 	}
 
-	if authenticator.accessToken.Type != accessToken.Type {
-		t.Fatalf("Unexpected Type '%s' in access token generated from http response.", authenticator.accessToken.Type)
+	if actualToken.Type != expectedToken.Type {
+		t.Fatalf("Unexpected Type '%s' in access token generated from http response.", actualToken.Type)
 	}
 
-	if authenticator.accessToken.ExpiresIn != accessToken.ExpiresIn {
-		t.Fatalf("Unexpected ExpiresIn '%s' in access token generated from http response.", authenticator.accessToken.ExpiresIn)
+	if actualToken.ExpiresIn != expectedToken.ExpiresIn {
+		t.Fatalf("Unexpected ExpiresIn '%s' in access token generated from http response.", actualToken.ExpiresIn)
 	}
 
-	if authenticator.accessToken.Scope != accessToken.Scope {
-		t.Fatalf("Unexpected Scope '%s' in access token generated from http response.", authenticator.accessToken.Scope)
+	if actualToken.Scope != expectedToken.Scope {
+		t.Fatalf("Unexpected Scope '%s' in access token generated from http response.", actualToken.Scope)
 	}
 
 	// verify that the expiration time is wihin 3 seconds of what is expected
-	if authenticator.accessToken.ExpiresAt.After(time.Now().Add(100*time.Second)) ||
-		authenticator.accessToken.ExpiresAt.Before(time.Now().Add(97*time.Second)) {
-		t.Fatalf("Unexpected ExpiresAt '%s' in access token generated from http response.", authenticator.accessToken.ExpiresAt)
+	if actualToken.ExpiresAt.After(time.Now().Add(100*time.Second)) ||
+		actualToken.ExpiresAt.Before(time.Now().Add(97*time.Second)) {
+		t.Fatalf("Unexpected ExpiresAt '%s' in access token generated from http response.", actualToken.ExpiresAt)
 	}
 }
 
 // Make sure the access token expires as expected.
-func TestAuthenticatorExpired(t *testing.T) {
+func TestAccessTokenExpired(t *testing.T) {
 	accessToken := newMockAccessToken(12)
 	if accessToken.expired() {
 		t.Fatalf("Access token should not have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
@@ -103,29 +102,22 @@ func TestAuthenticatorExpired(t *testing.T) {
 
 // Make sure a valid authToken is being generated from a given access token.
 func TestAuthenticatorAuthToken(t *testing.T) {
-	authenticator := &authenticator{
-		clientId:     "clientId",
-		clientSecret: "clientSecret",
-		accessToken:  newMockAccessToken(100),
-	}
+	authenticator := newMockAuthenticator(newMockAccessToken(100))
 
 	authToken, err := authenticator.authToken()
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err)
 	}
 
-	if authToken != fmt.Sprintf("Bearer %s", authenticator.accessToken.Token) {
+	expectedToken := <-authenticator.accessTokenChan
+	if authToken != fmt.Sprintf("Bearer %s", expectedToken.Token) {
 		t.Fatalf("Invalid authToken ''.", authToken)
 	}
 }
 
 // Make sure Authenticate() correctly sets the authrorization header of a given request.
 func TestAuthenticatorAuthenticate(t *testing.T) {
-	authenticator := &authenticator{
-		clientId:     "clientId",
-		clientSecret: "clientSecret",
-		accessToken:  newMockAccessToken(100),
-	}
+	authenticator := newMockAuthenticator(newMockAccessToken(100))
 
 	authToken, err := authenticator.authToken()
 	if err != nil {
