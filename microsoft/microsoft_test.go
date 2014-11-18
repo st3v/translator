@@ -27,6 +27,22 @@ func newMockAuthenticator(token *accessToken) *authenticator {
 	}
 }
 
+func newMockAuthenticationProvider() *mockAuthenticationProvider {
+	return &mockAuthenticationProvider{
+		refreshAccessToken: func(token *accessToken) error {
+			return nil
+		},
+	}
+}
+
+type mockAuthenticationProvider struct {
+	refreshAccessToken func(token *accessToken) error
+}
+
+func (p *mockAuthenticationProvider) RefreshAccessToken(token *accessToken) error {
+	return p.refreshAccessToken(token)
+}
+
 func newMockLanguageProvider() *mockLanguageProvider {
 	return &mockLanguageProvider{
 		callCounter: make(map[string]int),

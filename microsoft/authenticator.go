@@ -49,7 +49,8 @@ func (a *authenticator) authToken() (string, error) {
 
 	// make sure it's valid, otherwise request a new one
 	if accessToken == nil || accessToken.expired() {
-		if err := a.provider.RefreshAccessToken(accessToken); err != nil {
+		err := a.provider.RefreshAccessToken(accessToken)
+		if err != nil || accessToken == nil {
 			a.accessTokenChan <- nil
 			return "", err
 		}
