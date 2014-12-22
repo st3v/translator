@@ -22,9 +22,9 @@ type authenticator struct {
 }
 
 func newAuthenticator(clientId, clientSecret string) Authenticator {
-	// make buffered accessToken channel an pre-fill it with nil
+	// make buffered accessToken channel an pre-fill it with an expired token
 	tokenChan := make(chan *accessToken, 1)
-	tokenChan <- nil
+	tokenChan <- &accessToken{}
 
 	// return new authenticator that uses the above accessToken channel
 	return &authenticator{
