@@ -1,3 +1,21 @@
 language: go
 
-script: go test -v -race ./...
+matrix:
+  include:
+    - go: "1.2"
+      env: VET_PACKAGE=code.google.com/p/go.tools/cmd/vet
+    - go: "1.3"
+      env: VET_PACKAGE=code.google.com/p/go.tools/cmd/vet
+    - go: "1.4"
+      env: VET_PACKAGE=golang.org/x/tools/cmd/vet
+
+before_script:
+  - go get $VET_PACKAGE
+  - go get github.com/golang/lint/golint
+
+script:
+  - go test -v -race ./...
+  - go tool vet -all=true -v=true .
+
+# have travis use a docker container for this build
+sudo: false
