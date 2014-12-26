@@ -17,6 +17,7 @@ before_script:
 script:
   - go test -v -race ./...
   - go tool vet -all=true -v=true .
-
+  - golint ./...
+  
 # have travis use a docker container for this build
 sudo: false
