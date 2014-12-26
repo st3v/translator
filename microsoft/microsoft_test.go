@@ -102,32 +102,32 @@ func (p *mockTranslationProvider) Translate(text, from, to string) (string, erro
 
 func newMockRouter() *mockRouter {
 	return &mockRouter{
-		authUrl:          "auth",
-		translationUrl:   "translation",
-		languageNamesUrl: "languages_names",
-		languageCodesUrl: "languages_codes",
+		authURL:          "auth",
+		translationURL:   "translation",
+		languageNamesURL: "languages_names",
+		languageCodesURL: "languages_codes",
 	}
 }
 
 type mockRouter struct {
-	authUrl          string
-	translationUrl   string
-	languageNamesUrl string
-	languageCodesUrl string
+	authURL          string
+	translationURL   string
+	languageNamesURL string
+	languageCodesURL string
 }
 
-func (m *mockRouter) AuthUrl() string {
-	return m.authUrl
+func (m *mockRouter) AuthURL() string {
+	return m.authURL
 }
 
-func (m *mockRouter) TranslationUrl() string {
-	return m.translationUrl
+func (m *mockRouter) TranslationURL() string {
+	return m.translationURL
 }
 
-func (m *mockRouter) LanguageNamesUrl() string {
-	return m.languageNamesUrl
+func (m *mockRouter) LanguageNamesURL() string {
+	return m.languageNamesURL
 }
 
-func (m *mockRouter) LanguageCodesUrl() string {
-	return m.languageCodesUrl
+func (m *mockRouter) LanguageCodesURL() string {
+	return m.languageCodesURL
 }

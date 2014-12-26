@@ -27,7 +27,7 @@ func TestLanguageProviderCodes(t *testing.T) {
 			t.Fatalf("Unexpected authorization header for request: %s", r.Header.Get("Authorization"))
 		}
 
-		response, err := xml.Marshal(newXmlArrayOfStrings(expectedCodes))
+		response, err := xml.Marshal(newXMLArrayOfStrings(expectedCodes))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
 		}
@@ -40,11 +40,11 @@ func TestLanguageProviderCodes(t *testing.T) {
 	defer server.Close()
 
 	router := newMockRouter()
-	router.languageCodesUrl = server.URL
+	router.languageCodesURL = server.URL
 
 	languageProvider := &languageProvider{
 		router:     router,
-		httpClient: newHttpClient(authenticator),
+		httpClient: newHTTPClient(authenticator),
 	}
 
 	actualCodes, err := languageProvider.Codes()
@@ -103,7 +103,7 @@ func TestLanguageProviderNames(t *testing.T) {
 			}
 		}
 
-		response, err := xml.Marshal(newXmlArrayOfStrings(expectedNames))
+		response, err := xml.Marshal(newXMLArrayOfStrings(expectedNames))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
 		}
@@ -116,11 +116,11 @@ func TestLanguageProviderNames(t *testing.T) {
 	defer server.Close()
 
 	router := newMockRouter()
-	router.languageNamesUrl = server.URL
+	router.languageNamesURL = server.URL
 
 	languageProvider := &languageProvider{
 		router:     router,
-		httpClient: newHttpClient(authenticator),
+		httpClient: newHTTPClient(authenticator),
 	}
 
 	actualNames, err := languageProvider.Names(expectedCodes)

@@ -8,7 +8,7 @@ type xmlString struct {
 	Value     string   `xml:",innerxml"`
 }
 
-func newXmlString(value string) *xmlString {
+func newXMLString(value string) *xmlString {
 	return &xmlString{
 		Namespace: "http://schemas.microsoft.com/2003/10/Serialization/",
 		Value:     value,
@@ -22,7 +22,7 @@ type xmlArrayOfStrings struct {
 	Strings           []string `xml:"string"`
 }
 
-func newXmlArrayOfStrings(values []string) *xmlArrayOfStrings {
+func newXMLArrayOfStrings(values []string) *xmlArrayOfStrings {
 	return &xmlArrayOfStrings{
 		Namespace:         "http://schemas.microsoft.com/2003/10/Serialization/Arrays",
 		InstanceNamespace: "http://www.w3.org/2001/XMLSchema-instance",

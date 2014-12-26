@@ -9,10 +9,14 @@ import (
 	"github.com/st3v/translator"
 )
 
+// The LanguageCatalog provides a slice of languages supported by
+// Microsoft's Translation API.
 type LanguageCatalog interface {
 	Languages() ([]translator.Language, error)
 }
 
+// The LanguageProvider retrieves the names and codes of all languages
+// supported by the API.
 type LanguageProvider interface {
 	Codes() ([]string, error)
 	Names(codes []string) ([]string, error)
@@ -25,7 +29,7 @@ type languageCatalog struct {
 
 type languageProvider struct {
 	router     Router
-	httpClient HttpClient
+	httpClient HTTPClient
 }
 
 func newLanguageCatalog(provider LanguageProvider) LanguageCatalog {
@@ -37,7 +41,7 @@ func newLanguageCatalog(provider LanguageProvider) LanguageCatalog {
 func newLanguageProvider(authenticator Authenticator) LanguageProvider {
 	return &languageProvider{
 		router:     newRouter(),
-		httpClient: newHttpClient(authenticator),
+		httpClient: newHTTPClient(authenticator),
 	}
 }
 
@@ -66,8 +70,8 @@ func (c *languageCatalog) Languages() ([]translator.Language, error) {
 }
 
 func (p *languageProvider) Names(codes []string) ([]string, error) {
-	payload, _ := xml.Marshal(newXmlArrayOfStrings(codes))
-	uri := p.router.LanguageNamesUrl() + "?locale=en"
+	payload, _ := xml.Marshal(newXMLArrayOfStrings(codes))
+	uri := p.router.LanguageNamesURL() + "?locale=en"
 
 	response, err := p.httpClient.SendRequest("POST", uri, strings.NewReader(string(payload)), "text/xml")
 	if err != nil {
@@ -89,7 +93,7 @@ func (p *languageProvider) Names(codes []string) ([]string, error) {
 }
 
 func (p *languageProvider) Codes() ([]string, error) {
-	response, err := p.httpClient.SendRequest("GET", p.router.LanguageCodesUrl(), nil, "text/plain")
+	response, err := p.httpClient.SendRequest("GET", p.router.LanguageCodesURL(), nil, "text/plain")
 	if err != nil {
 		return nil, tracerr.Wrap(err)
 	}

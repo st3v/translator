@@ -9,26 +9,28 @@ import (
 	"github.com/st3v/tracerr"
 )
 
+// The TranslationProvider communicates with Microsoft's
+// API to provide a translation for a given text.
 type TranslationProvider interface {
 	Translate(text, from, to string) (string, error)
 }
 
 type translationProvider struct {
 	router     Router
-	httpClient HttpClient
+	httpClient HTTPClient
 }
 
 func newTranslationProvider(authenticator Authenticator) TranslationProvider {
 	return &translationProvider{
 		router:     newRouter(),
-		httpClient: newHttpClient(authenticator),
+		httpClient: newHTTPClient(authenticator),
 	}
 }
 
 func (p *translationProvider) Translate(text, from, to string) (string, error) {
 	uri := fmt.Sprintf(
 		"%s?text=%s&from=%s&to=%s",
-		p.router.TranslationUrl(),
+		p.router.TranslationURL(),
 		url.QueryEscape(text),
 		url.QueryEscape(from),
 		url.QueryEscape(to))

@@ -1,18 +1,20 @@
 package microsoft
 
 const (
-	authUrl          = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-	serviceUrl       = "http://api.microsofttranslator.com/v2/Http.svc/"
-	translationUrl   = serviceUrl + "Translate"
-	languageNamesUrl = serviceUrl + "GetLanguageNames"
-	languageCodesUrl = serviceUrl + "GetLanguagesForTranslate"
+	authURL          = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
+	serviceURL       = "http://api.microsofttranslator.com/v2/Http.svc/"
+	translationURL   = serviceURL + "Translate"
+	languageNamesURL = serviceURL + "GetLanguageNames"
+	languageCodesURL = serviceURL + "GetLanguagesForTranslate"
 )
 
+// The Router provides the necessary URLs to communicate with
+// Microsoft's API.
 type Router interface {
-	AuthUrl() string
-	TranslationUrl() string
-	LanguageNamesUrl() string
-	LanguageCodesUrl() string
+	AuthURL() string
+	TranslationURL() string
+	LanguageNamesURL() string
+	LanguageCodesURL() string
 }
 
 type router struct{}
@@ -21,18 +23,18 @@ func newRouter() Router {
 	return &router{}
 }
 
-func (r *router) AuthUrl() string {
-	return authUrl
+func (r *router) AuthURL() string {
+	return authURL
 }
 
-func (r *router) TranslationUrl() string {
-	return translationUrl
+func (r *router) TranslationURL() string {
+	return translationURL
 }
 
-func (r *router) LanguageNamesUrl() string {
-	return languageNamesUrl
+func (r *router) LanguageNamesURL() string {
+	return languageNamesURL
 }
 
-func (r *router) LanguageCodesUrl() string {
-	return languageCodesUrl
+func (r *router) LanguageCodesURL() string {
+	return languageCodesURL
 }

@@ -7,7 +7,8 @@ import (
 	"github.com/st3v/tracerr"
 )
 
-type HttpClient interface {
+// The HTTPClient sends authenticated HTTP requests to Microsoft's Translation API
+type HTTPClient interface {
 	SendRequest(method, uri string, body io.Reader, contentType string) (*http.Response, error)
 }
 
@@ -16,7 +17,7 @@ type httpClient struct {
 	authenticator Authenticator
 }
 
-func newHttpClient(authenticator Authenticator) HttpClient {
+func newHTTPClient(authenticator Authenticator) HTTPClient {
 	return &httpClient{
 		client:        &http.Client{},
 		authenticator: authenticator,

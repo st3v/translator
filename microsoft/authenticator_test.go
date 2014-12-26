@@ -2,7 +2,6 @@ package microsoft
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +13,7 @@ import (
 // Make sure function requestAccessToken sends the expected request to the server
 // and is able to generate a valid access token from the server's response.
 func TestAuthenticatorRefreshAccessToken(t *testing.T) {
-	clientId := "foobar"
+	clientID := "foobar"
 	clientSecret := "private"
 
 	expectedToken := newMockAccessToken(100)
@@ -24,7 +23,7 @@ func TestAuthenticatorRefreshAccessToken(t *testing.T) {
 			t.Fatalf("Unexpected request method: %s", r.Method)
 		}
 
-		if r.PostFormValue("client_id") != clientId {
+		if r.PostFormValue("client_id") != clientID {
 			t.Fatalf("Unexpected client_id '%s' in post request.", r.PostFormValue("client_id"))
 		}
 
@@ -53,10 +52,10 @@ func TestAuthenticatorRefreshAccessToken(t *testing.T) {
 	defer server.Close()
 
 	router := newMockRouter()
-	router.authUrl = server.URL
+	router.authURL = server.URL
 
 	authenticationProvider := &authenticationProvider{
-		clientId:     clientId,
+		clientID:     clientID,
 		clientSecret: clientSecret,
 		router:       router,
 	}
@@ -173,7 +172,7 @@ func TestAuthenticatorConcurrentAuthenticate(t *testing.T) {
 			<-readyGo
 			authToken, err := authenticator.authToken()
 			if err == nil && authToken != authenticator.expectedAuthToken(t) {
-				err = errors.New(fmt.Sprintf("Unexpected authToken `%s`. Expected `%s`.", authToken, authenticator.expectedAuthToken(t)))
+				err = fmt.Errorf("Unexpected authToken `%s`. Expected `%s`.", authToken, authenticator.expectedAuthToken(t))
 			}
 			errChan <- err
 			close(errChan)

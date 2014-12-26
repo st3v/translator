@@ -41,7 +41,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 			t.Fatalf("Unexpected `from` param in request: %s", r.FormValue("from"))
 		}
 
-		response, err := xml.Marshal(newXmlString(expectedTranslation))
+		response, err := xml.Marshal(newXMLString(expectedTranslation))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
 		}
@@ -54,11 +54,11 @@ func TestTranslationProviderTranslate(t *testing.T) {
 	defer server.Close()
 
 	router := newMockRouter()
-	router.translationUrl = server.URL
+	router.translationURL = server.URL
 
 	translationProvider := &translationProvider{
 		router:     router,
-		httpClient: newHttpClient(authenticator),
+		httpClient: newHTTPClient(authenticator),
 	}
 
 	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo)

@@ -8,8 +8,13 @@ type api struct {
 	translationProvider TranslationProvider
 }
 
-func NewTranslator(clientId, clientSecret string) translator.Translator {
-	authenticator := newAuthenticator(clientId, clientSecret)
+// NewTranslator returns a struct that implements the Translator
+// interface by exposing a Translate and a Languages function that
+// are backed by Microsoft's translation API.
+// The function takes the clientID and clientSecret for an existing
+// app registered in Microsoft's Azure DataMarket.
+func NewTranslator(clientID, clientSecret string) translator.Translator {
+	authenticator := newAuthenticator(clientID, clientSecret)
 	return &api{
 		languageCatalog:     newLanguageCatalog(newLanguageProvider(authenticator)),
 		translationProvider: newTranslationProvider(authenticator),

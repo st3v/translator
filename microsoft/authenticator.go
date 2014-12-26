@@ -13,7 +13,10 @@ import (
 
 const scope = "http://api.microsofttranslator.com"
 
+// Authenticator is used to authenicate HTTP requests to Microsoft's
+// Translation API.
 type Authenticator interface {
+	// Authenticate a given HTTP request.
 	Authenticate(request *http.Request) error
 }
 
@@ -22,14 +25,14 @@ type authenticator struct {
 	accessTokenChan chan *accessToken
 }
 
-func newAuthenticator(clientId, clientSecret string) Authenticator {
+func newAuthenticator(clientID, clientSecret string) Authenticator {
 	// make buffered accessToken channel and pre-fill it with an expired token
 	tokenChan := make(chan *accessToken, 1)
 	tokenChan <- &accessToken{}
 
 	// return new authenticator that uses the above accessToken channel
 	return &authenticator{
-		provider:        newAuthenticationProvider(clientId, clientSecret),
+		provider:        newAuthenticationProvider(clientID, clientSecret),
 		accessTokenChan: tokenChan,
 	}
 }
@@ -77,19 +80,21 @@ func (t *accessToken) expired() bool {
 	return t.ExpiresAt.Before(time.Now().Add(time.Second * 10))
 }
 
+// The AuthenticationProvider is used to refresh access tokens for
+// Microsoft's API endpoints.
 type AuthenticationProvider interface {
 	RefreshAccessToken(*accessToken) error
 }
 
 type authenticationProvider struct {
-	clientId     string
+	clientID     string
 	clientSecret string
 	router       Router
 }
 
-func newAuthenticationProvider(clientId, clientSecret string) AuthenticationProvider {
+func newAuthenticationProvider(clientID, clientSecret string) AuthenticationProvider {
 	return &authenticationProvider{
-		clientId:     clientId,
+		clientID:     clientID,
 		clientSecret: clientSecret,
 		router:       newRouter(),
 	}
@@ -97,12 +102,12 @@ func newAuthenticationProvider(clientId, clientSecret string) AuthenticationProv
 
 func (p *authenticationProvider) RefreshAccessToken(token *accessToken) error {
 	values := make(url.Values)
-	values.Set("client_id", p.clientId)
+	values.Set("client_id", p.clientID)
 	values.Set("client_secret", p.clientSecret)
 	values.Set("scope", scope)
 	values.Set("grant_type", "client_credentials")
 
-	response, err := http.PostForm(p.router.AuthUrl(), values)
+	response, err := http.PostForm(p.router.AuthURL(), values)
 	if err != nil {
 		return tracerr.Wrap(err)
 	}
