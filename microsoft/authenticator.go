@@ -3,7 +3,6 @@ package microsoft
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -105,25 +104,21 @@ func (p *authenticationProvider) RefreshAccessToken(token *accessToken) error {
 
 	response, err := http.PostForm(p.router.AuthUrl(), values)
 	if err != nil {
-		log.Println(err)
 		return tracerr.Wrap(err)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
-		log.Println(err)
 		return tracerr.Wrap(err)
 	}
 
 	if err := json.Unmarshal(body, token); err != nil {
-		log.Println(err)
 		return tracerr.Wrap(err)
 	}
 
 	expiresInSeconds, err := strconv.Atoi(token.ExpiresIn)
 	if err != nil {
-		log.Println(err)
 		return tracerr.Wrap(err)
 	}
 
