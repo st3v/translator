@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/st3v/tracerr"
 	"github.com/st3v/translator"
 )
 
@@ -44,12 +45,12 @@ func (c *languageCatalog) Languages() ([]translator.Language, error) {
 	if c.languages == nil {
 		codes, err := c.provider.Codes()
 		if err != nil {
-			return nil, err
+			return nil, tracerr.Wrap(err)
 		}
 
 		names, err := c.provider.Names(codes)
 		if err != nil {
-			return nil, err
+			return nil, tracerr.Wrap(err)
 		}
 
 		for i := range codes {
@@ -70,18 +71,18 @@ func (p *languageProvider) Names(codes []string) ([]string, error) {
 
 	response, err := p.httpClient.SendRequest("POST", uri, strings.NewReader(string(payload)), "text/xml")
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	result := &xmlArrayOfStrings{}
 	if err := xml.Unmarshal(body, &result); err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	return result.Strings, nil
@@ -90,18 +91,18 @@ func (p *languageProvider) Names(codes []string) ([]string, error) {
 func (p *languageProvider) Codes() ([]string, error) {
 	response, err := p.httpClient.SendRequest("GET", p.router.LanguageCodesUrl(), nil, "text/plain")
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	result := &xmlArrayOfStrings{}
 	if err = xml.Unmarshal(body, &result); err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	return result.Strings, nil

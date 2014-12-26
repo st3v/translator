@@ -3,6 +3,8 @@ package microsoft
 import (
 	"io"
 	"net/http"
+
+	"github.com/st3v/tracerr"
 )
 
 type HttpClient interface {
@@ -24,19 +26,19 @@ func newHttpClient(authenticator Authenticator) HttpClient {
 func (h *httpClient) SendRequest(method, uri string, body io.Reader, contentType string) (*http.Response, error) {
 	request, err := http.NewRequest(method, uri, body)
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	request.Header.Add("Content-Type", contentType)
 
 	err = h.authenticator.Authenticate(request)
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	response, err := h.client.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, tracerr.Wrap(err)
 	}
 
 	return response, nil

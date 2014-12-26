@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+
+	"github.com/st3v/tracerr"
 )
 
 type TranslationProvider interface {
@@ -33,19 +35,19 @@ func (p *translationProvider) Translate(text, from, to string) (string, error) {
 
 	response, err := p.httpClient.SendRequest("GET", uri, nil, "text/plain")
 	if err != nil {
-		return "", err
+		return "", tracerr.Wrap(err)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
-		return "", err
+		return "", tracerr.Wrap(err)
 	}
 
 	translation := &xmlString{}
 	err = xml.Unmarshal(body, &translation)
 	if err != nil {
-		return "", err
+		return "", tracerr.Wrap(err)
 	}
 
 	return translation.Value, nil

@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/st3v/tracerr"
 )
 
 const scope = "http://api.microsofttranslator.com"
@@ -22,7 +24,7 @@ type authenticator struct {
 }
 
 func newAuthenticator(clientId, clientSecret string) Authenticator {
-	// make buffered accessToken channel an pre-fill it with an expired token
+	// make buffered accessToken channel and pre-fill it with an expired token
 	tokenChan := make(chan *accessToken, 1)
 	tokenChan <- &accessToken{}
 
@@ -36,7 +38,7 @@ func newAuthenticator(clientId, clientSecret string) Authenticator {
 func (a *authenticator) Authenticate(request *http.Request) error {
 	authToken, err := a.authToken()
 	if err != nil {
-		return err
+		return tracerr.Wrap(err)
 	}
 
 	request.Header.Add("Authorization", authToken)
@@ -52,7 +54,7 @@ func (a *authenticator) authToken() (string, error) {
 		err := a.provider.RefreshAccessToken(accessToken)
 		if err != nil || accessToken == nil {
 			a.accessTokenChan <- nil
-			return "", err
+			return "", tracerr.Wrap(err)
 		}
 	}
 
@@ -104,25 +106,25 @@ func (p *authenticationProvider) RefreshAccessToken(token *accessToken) error {
 	response, err := http.PostForm(p.router.AuthUrl(), values)
 	if err != nil {
 		log.Println(err)
-		return err
+		return tracerr.Wrap(err)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
 		log.Println(err)
-		return err
+		return tracerr.Wrap(err)
 	}
 
 	if err := json.Unmarshal(body, token); err != nil {
 		log.Println(err)
-		return err
+		return tracerr.Wrap(err)
 	}
 
 	expiresInSeconds, err := strconv.Atoi(token.ExpiresIn)
 	if err != nil {
 		log.Println(err)
-		return err
+		return tracerr.Wrap(err)
 	}
 
 	token.ExpiresAt = time.Now().Add(time.Duration(expiresInSeconds) * time.Second)
