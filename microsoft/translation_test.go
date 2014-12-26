@@ -43,7 +43,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 
 		response, err := xml.Marshal(newXmlString(expectedTranslation))
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err)
+			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
 		}
 
 		w.Header().Set("Content-Type", "text/xml")
@@ -63,7 +63,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 
 	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo)
 	if err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+		t.Fatalf("Unexpected error: %s", err.Error())
 	}
 
 	if actualTranslation != expectedTranslation {

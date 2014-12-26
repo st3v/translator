@@ -19,7 +19,7 @@ func main() {
 func helloWorld(t translator.Translator) {
 	languages, err := t.Languages()
 	if err != nil {
-		fmt.Printf("Error retrieving languages: %s\n", err)
+		fmt.Printf("Error retrieving languages: %s\n", err.Error())
 		return
 	}
 
@@ -43,7 +43,7 @@ func translate(t translator.Translator, text, from string, to translator.Languag
 	go func() {
 		translation, err := t.Translate(text, from, to.Code)
 		if err != nil {
-			out <- fmt.Sprintf("Error during translation for %s: %s", to.Name, err)
+			out <- fmt.Sprintf("Error during translation for %s: %s", to.Name, err.Error())
 		} else {
 			out <- fmt.Sprintf("%s [%s]: %s", to.Name, to.Code, translation)
 		}

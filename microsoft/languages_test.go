@@ -29,7 +29,7 @@ func TestLanguageProviderCodes(t *testing.T) {
 
 		response, err := xml.Marshal(newXmlArrayOfStrings(expectedCodes))
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err)
+			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
 		}
 
 		w.Header().Set("Content-Type", "text/xml")
@@ -85,12 +85,12 @@ func TestLanguageProviderNames(t *testing.T) {
 		body, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
-			t.Fatalf("Unexpected error reading request body: %s", err)
+			t.Fatalf("Unexpected error reading request body: %s", err.Error())
 		}
 
 		actualCodes := &xmlArrayOfStrings{}
 		if err := xml.Unmarshal(body, &actualCodes); err != nil {
-			t.Fatalf("Unexpected error unmarshalling xml request body: %s", err)
+			t.Fatalf("Unexpected error unmarshalling xml request body: %s", err.Error())
 		}
 
 		if len(actualCodes.Strings) != len(expectedCodes) {
@@ -105,7 +105,7 @@ func TestLanguageProviderNames(t *testing.T) {
 
 		response, err := xml.Marshal(newXmlArrayOfStrings(expectedNames))
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err)
+			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
 		}
 
 		w.Header().Set("Content-Type", "text/xml")
@@ -125,7 +125,7 @@ func TestLanguageProviderNames(t *testing.T) {
 
 	actualNames, err := languageProvider.Names(expectedCodes)
 	if err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+		t.Fatalf("Unexpected error: %s", err.Error())
 	}
 
 	if len(actualNames) != len(expectedNames) {
@@ -154,7 +154,7 @@ func TestLanguageCatalogLanguages(t *testing.T) {
 	for _ = range make([]int, 3) {
 		languages, err := languageCatalog.Languages()
 		if err != nil {
-			t.Fatalf("Unexpected error: %s", err)
+			t.Fatalf("Unexpected error: %s", err.Error())
 		}
 
 		if languageProvider.callCounter["Codes"] != 1 {
@@ -184,7 +184,7 @@ func TestLanguageCatalogLanguages(t *testing.T) {
 func (a *authenticator) expectedAuthToken(t *testing.T) string {
 	token, err := a.authToken()
 	if err != nil {
-		t.Fatalf("Unexpected error getting authToken from authenticator: %s", err)
+		t.Fatalf("Unexpected error getting authToken from authenticator: %s", err.Error())
 	}
 	return token
 }

@@ -18,7 +18,7 @@ func TestTranslate(t *testing.T) {
 
 	actualTranslation, err := api.Translate(original, from, to)
 	if err != nil {
-		t.Errorf("Unexpected error: %s", err)
+		t.Errorf("Unexpected error: %s", err.Error())
 	}
 
 	if actualTranslation != expectedTranslation {
@@ -50,7 +50,7 @@ func TestApiLanguages(t *testing.T) {
 
 	actualLanguages, err := api.Languages()
 	if err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+		t.Fatalf("Unexpected error: %s", err.Error())
 	}
 
 	if len(actualLanguages) != len(expectedLanguages) {

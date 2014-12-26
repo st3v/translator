@@ -42,7 +42,7 @@ func TestAuthenticatorRefreshAccessToken(t *testing.T) {
 
 		response, err := json.Marshal(expectedToken)
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling json repsonse: %s", err)
+			t.Fatalf("Unexpected error marshalling json repsonse: %s", err.Error())
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -63,7 +63,7 @@ func TestAuthenticatorRefreshAccessToken(t *testing.T) {
 
 	actualToken := &accessToken{}
 	if err := authenticationProvider.RefreshAccessToken(actualToken); err != nil {
-		t.Fatalf("Unexpected error returned by requestAccessToken: %s", err)
+		t.Fatalf("Unexpected error returned by requestAccessToken: %s", err.Error())
 	}
 
 	if actualToken.Token != expectedToken.Token {
@@ -108,7 +108,7 @@ func TestAuthenticatorAuthToken(t *testing.T) {
 
 	authToken, err := authenticator.authToken()
 	if err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+		t.Fatalf("Unexpected error: %s", err.Error())
 	}
 
 	expectedToken := <-authenticator.accessTokenChan
@@ -123,12 +123,12 @@ func TestAuthenticatorAuthenticate(t *testing.T) {
 
 	authToken, err := authenticator.authToken()
 	if err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+		t.Fatalf("Unexpected error: %s", err.Error())
 	}
 
 	r, err := http.NewRequest("GET", "http://foo.bar", nil)
 	if err != nil {
-		t.Fatalf("Unexpected error when getting new request: %s", err)
+		t.Fatalf("Unexpected error when getting new request: %s", err.Error())
 	}
 
 	if r.Header.Get("Authorization") != "" {
@@ -188,7 +188,7 @@ func TestAuthenticatorConcurrentAuthenticate(t *testing.T) {
 	// loop over errors in the channel and make sure they are all nil
 	for err := range mergeErrorChans(errorChans) {
 		if err != nil {
-			t.Error(err)
+			t.Error(err.Error())
 		}
 	}
 
