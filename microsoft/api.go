@@ -1,9 +1,11 @@
 package microsoft
 
-import "github.com/st3v/translator"
+import (
+	"github.com/st3v/translator"
+	"github.com/st3v/translator/microsoft/auth"
+)
 
 type api struct {
-	router              Router
 	languageCatalog     LanguageCatalog
 	translationProvider TranslationProvider
 }
@@ -14,10 +16,12 @@ type api struct {
 // The function takes the clientID and clientSecret for an existing
 // app registered in Microsoft's Azure DataMarket.
 func NewTranslator(clientID, clientSecret string) translator.Translator {
-	authenticator := newAuthenticator(clientID, clientSecret)
+	scope := "http://api.microsofttranslator.com"
+	router := newRouter()
+	authenticator := auth.NewAuthenticator(clientID, clientSecret, scope, router.AuthURL())
 	return &api{
-		languageCatalog:     newLanguageCatalog(newLanguageProvider(authenticator)),
-		translationProvider: newTranslationProvider(authenticator),
+		languageCatalog:     newLanguageCatalog(newLanguageProvider(authenticator, router)),
+		translationProvider: newTranslationProvider(authenticator, router),
 	}
 }
 
