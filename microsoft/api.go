@@ -2,7 +2,7 @@ package microsoft
 
 import (
 	"github.com/st3v/translator"
-	"github.com/st3v/translator/microsoft/auth"
+	msauth "github.com/st3v/translator/microsoft/auth"
 )
 
 type api struct {
@@ -18,7 +18,7 @@ type api struct {
 func NewTranslator(clientID, clientSecret string) translator.Translator {
 	scope := "http://api.microsofttranslator.com"
 	router := newRouter()
-	authenticator := auth.NewAuthenticator(clientID, clientSecret, scope, router.AuthURL())
+	authenticator := msauth.NewAuthenticator(clientID, clientSecret, scope, router.AuthURL())
 	return &api{
 		languageCatalog:     newLanguageCatalog(newLanguageProvider(authenticator, router)),
 		translationProvider: newTranslationProvider(authenticator, router),

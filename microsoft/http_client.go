@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/st3v/tracerr"
-	"github.com/st3v/translator/microsoft/auth"
+	msauth "github.com/st3v/translator/microsoft/auth"
 )
 
 // The HTTPClient sends authenticated HTTP requests to Microsoft's Translation API
@@ -15,10 +15,10 @@ type HTTPClient interface {
 
 type httpClient struct {
 	client        *http.Client
-	authenticator auth.Authenticator
+	authenticator msauth.Authenticator
 }
 
-func newHTTPClient(authenticator auth.Authenticator) HTTPClient {
+func newHTTPClient(authenticator msauth.Authenticator) HTTPClient {
 	return &httpClient{
 		client:        &http.Client{},
 		authenticator: authenticator,
