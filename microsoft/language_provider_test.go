@@ -12,8 +12,6 @@ import (
 func TestLanguageProviderCodes(t *testing.T) {
 	expectedCodes := []string{"en", "de", "es", "ru", "jp"}
 
-	authenticator := newMockAuthenticator(newMockAccessToken(100))
-
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
@@ -21,10 +19,6 @@ func TestLanguageProviderCodes(t *testing.T) {
 
 		if r.Header.Get("Content-Type") != "text/plain" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
-		}
-
-		if r.Header.Get("Authorization") != authenticator.expectedAuthToken(t) {
-			t.Fatalf("Unexpected authorization header for request: %s", r.Header.Get("Authorization"))
 		}
 
 		response, err := xml.Marshal(newXMLArrayOfStrings(expectedCodes))
@@ -44,7 +38,7 @@ func TestLanguageProviderCodes(t *testing.T) {
 
 	languageProvider := &languageProvider{
 		router:     router,
-		httpClient: newHTTPClient(authenticator),
+		httpClient: newAuthenticatedHTTPClient(),
 	}
 
 	actualCodes, err := languageProvider.Codes()
@@ -67,8 +61,6 @@ func TestLanguageProviderNames(t *testing.T) {
 	expectedCodes := []string{"en", "de", "es", "ru", "jp"}
 	expectedNames := []string{"English", "German", "Spanish", "Russian", "Japanese"}
 
-	authenticator := newMockAuthenticator(newMockAccessToken(100))
-
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
@@ -76,10 +68,6 @@ func TestLanguageProviderNames(t *testing.T) {
 
 		if r.Header.Get("Content-Type") != "text/xml" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
-		}
-
-		if r.Header.Get("Authorization") != authenticator.expectedAuthToken(t) {
-			t.Fatalf("Unexpected authorization header for request: %s", r.Header.Get("Authorization"))
 		}
 
 		body, err := ioutil.ReadAll(r.Body)
@@ -120,7 +108,7 @@ func TestLanguageProviderNames(t *testing.T) {
 
 	languageProvider := &languageProvider{
 		router:     router,
-		httpClient: newHTTPClient(authenticator),
+		httpClient: newAuthenticatedHTTPClient(),
 	}
 
 	actualNames, err := languageProvider.Names(expectedCodes)
@@ -139,52 +127,26 @@ func TestLanguageProviderNames(t *testing.T) {
 	}
 }
 
-func TestLanguageCatalogLanguages(t *testing.T) {
-	expectedCodes := []string{"en", "de", "es", "ru", "jp"}
-	expectedNames := []string{"English", "German", "Spanish", "Russian", "Japanese"}
-
-	// intantiate language catalog and inject mocked out language provider
-	languageProvider := newMockLanguageProvider()
-	languageProvider.codes = expectedCodes
-	languageProvider.names = expectedNames
-	languageCatalog := newLanguageCatalog(languageProvider)
-
-	// retrieve languages from catalog 3 times
-	// make sure the catalog caches languages, i.e. it sends exactly one request to the language provider methods
-	for _ = range make([]int, 3) {
-		languages, err := languageCatalog.Languages()
-		if err != nil {
-			t.Fatalf("Unexpected error: %s", err.Error())
-		}
-
-		if languageProvider.callCounter["Codes"] != 1 {
-			t.Fatalf("LanguagesProvider.Codes should have been called exactly once not %d times.", languageProvider.callCounter["Codes"])
-		}
-
-		if languageProvider.callCounter["Names"] != 1 {
-			t.Fatalf("LanguagesProvider.Names should have been called exactly once not %d times.", languageProvider.callCounter["Names"])
-		}
-
-		if len(languages) != len(expectedCodes) {
-			t.Fatalf("Unexpected number of languages: %q", languages)
-		}
-
-		for i := range expectedCodes {
-			if languages[i].Code != expectedCodes[i] {
-				t.Fatalf("Unexpected language code '%s'. Expected '%s'", languages[i].Code, expectedCodes[i])
-			}
-
-			if languages[i].Name != expectedNames[i] {
-				t.Fatalf("Unexpected language code '%s'. Expected '%s'", languages[i].Name, expectedNames[i])
-			}
-		}
+func newMockLanguageProvider() *mockLanguageProvider {
+	return &mockLanguageProvider{
+		callCounter: make(map[string]int),
+		codes:       make([]string, 0),
+		names:       make([]string, 0),
 	}
 }
 
-func (a *authenticator) expectedAuthToken(t *testing.T) string {
-	token, err := a.authToken()
-	if err != nil {
-		t.Fatalf("Unexpected error getting authToken from authenticator: %s", err.Error())
-	}
-	return token
+type mockLanguageProvider struct {
+	callCounter map[string]int
+	codes       []string
+	names       []string
+}
+
+func (p *mockLanguageProvider) Codes() ([]string, error) {
+	p.callCounter["Codes"]++
+	return p.codes, nil
+}
+
+func (p *mockLanguageProvider) Names(codes []string) ([]string, error) {
+	p.callCounter["Names"]++
+	return p.names, nil
 }

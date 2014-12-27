@@ -6,25 +6,14 @@ import (
 	"strings"
 
 	"github.com/st3v/tracerr"
-	"github.com/st3v/translator"
+	"github.com/st3v/translator/microsoft/auth"
 )
 
-// The LanguageCatalog provides a slice of languages supported by
-// Microsoft's Translation API.
-type LanguageCatalog interface {
-	Languages() ([]translator.Language, error)
-}
-
 // The LanguageProvider retrieves the names and codes of all languages
-// supported by the API.
+// supported by Microsoft's Translation API.
 type LanguageProvider interface {
 	Codes() ([]string, error)
 	Names(codes []string) ([]string, error)
-}
-
-type languageCatalog struct {
-	provider  LanguageProvider
-	languages []translator.Language
 }
 
 type languageProvider struct {
@@ -32,41 +21,11 @@ type languageProvider struct {
 	httpClient HTTPClient
 }
 
-func newLanguageCatalog(provider LanguageProvider) LanguageCatalog {
-	return &languageCatalog{
-		provider: provider,
-	}
-}
-
-func newLanguageProvider(authenticator Authenticator) LanguageProvider {
+func newLanguageProvider(authenticator auth.Authenticator, router Router) LanguageProvider {
 	return &languageProvider{
-		router:     newRouter(),
+		router:     router,
 		httpClient: newHTTPClient(authenticator),
 	}
-}
-
-func (c *languageCatalog) Languages() ([]translator.Language, error) {
-	if c.languages == nil {
-		codes, err := c.provider.Codes()
-		if err != nil {
-			return nil, tracerr.Wrap(err)
-		}
-
-		names, err := c.provider.Names(codes)
-		if err != nil {
-			return nil, tracerr.Wrap(err)
-		}
-
-		for i := range codes {
-			c.languages = append(
-				c.languages,
-				translator.Language{
-					Code: codes[i],
-					Name: names[i],
-				})
-		}
-	}
-	return c.languages, nil
 }
 
 func (p *languageProvider) Names(codes []string) ([]string, error) {
