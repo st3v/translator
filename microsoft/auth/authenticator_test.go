@@ -1,105 +1,11 @@
-package microsoft
+package auth
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"sync"
 	"testing"
-	"time"
 )
-
-// Make sure function requestAccessToken sends the expected request to the server
-// and is able to generate a valid access token from the server's response.
-func TestAuthenticatorRefreshAccessToken(t *testing.T) {
-	clientID := "foobar"
-	clientSecret := "private"
-
-	expectedToken := newMockAccessToken(100)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			t.Fatalf("Unexpected request method: %s", r.Method)
-		}
-
-		if r.PostFormValue("client_id") != clientID {
-			t.Fatalf("Unexpected client_id '%s' in post request.", r.PostFormValue("client_id"))
-		}
-
-		if r.PostFormValue("client_secret") != clientSecret {
-			t.Fatalf("Unexpected client_secret '%s' in post request.", r.PostFormValue("client_secret"))
-		}
-
-		if r.PostFormValue("scope") != scope {
-			t.Fatalf("Unexpected scope '%s' in post request.", r.PostFormValue("scope"))
-		}
-
-		if r.PostFormValue("grant_type") != "client_credentials" {
-			t.Fatalf("Unexpected grant_type '%s' in post request.", r.PostFormValue("grant_type"))
-		}
-
-		response, err := json.Marshal(expectedToken)
-		if err != nil {
-			t.Fatalf("Unexpected error marshalling json repsonse: %s", err.Error())
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		fmt.Fprint(w, string(response))
-		return
-	}))
-	defer server.Close()
-
-	router := newMockRouter()
-	router.authURL = server.URL
-
-	authenticationProvider := &authenticationProvider{
-		clientID:     clientID,
-		clientSecret: clientSecret,
-		router:       router,
-	}
-
-	actualToken := &accessToken{}
-	if err := authenticationProvider.RefreshAccessToken(actualToken); err != nil {
-		t.Fatalf("Unexpected error returned by requestAccessToken: %s", err.Error())
-	}
-
-	if actualToken.Token != expectedToken.Token {
-		t.Fatalf("Unexpected Token '%s' in access token generated from http response.", actualToken.Token)
-	}
-
-	if actualToken.Type != expectedToken.Type {
-		t.Fatalf("Unexpected Type '%s' in access token generated from http response.", actualToken.Type)
-	}
-
-	if actualToken.ExpiresIn != expectedToken.ExpiresIn {
-		t.Fatalf("Unexpected ExpiresIn '%s' in access token generated from http response.", actualToken.ExpiresIn)
-	}
-
-	if actualToken.Scope != expectedToken.Scope {
-		t.Fatalf("Unexpected Scope '%s' in access token generated from http response.", actualToken.Scope)
-	}
-
-	// verify that the expiration time is wihin 3 seconds of what is expected
-	if actualToken.ExpiresAt.After(time.Now().Add(100*time.Second)) ||
-		actualToken.ExpiresAt.Before(time.Now().Add(97*time.Second)) {
-		t.Fatalf("Unexpected ExpiresAt '%s' in access token generated from http response.", actualToken.ExpiresAt)
-	}
-}
-
-// Make sure the access token expires as expected.
-func TestAccessTokenExpired(t *testing.T) {
-	accessToken := newMockAccessToken(12)
-	if accessToken.expired() {
-		t.Fatalf("Access token should not have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
-	}
-
-	accessToken = newMockAccessToken(0)
-	if !accessToken.expired() {
-		t.Fatalf("Access token should have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
-	}
-}
 
 // Make sure a valid authToken is being generated from a given access token.
 func TestAuthenticatorAuthToken(t *testing.T) {
@@ -147,8 +53,8 @@ func TestAuthenticatorConcurrentAuthenticate(t *testing.T) {
 	callCount := 0
 
 	// mock out authentication provider, keep track of how many time the access token is being refreshed
-	provider := newMockAuthenticationProvider()
-	provider.refreshAccessToken = func(token *accessToken) error {
+	provider := newMockAccessTokenProvider()
+	provider.refreshToken = func(token *accessToken) error {
 		callCount++
 		*token = *newMockAccessToken(100)
 		return nil
@@ -156,7 +62,7 @@ func TestAuthenticatorConcurrentAuthenticate(t *testing.T) {
 
 	// create an authenticator that uses the mock provider and starts with an expired access token that needs to be refreshed
 	authenticator := newMockAuthenticator(&accessToken{})
-	authenticator.provider = provider
+	authenticator.accessTokenProvider = provider
 
 	// channel to make sure all concurrent go routines start at the same time
 	readyGo := make(chan bool)
@@ -220,4 +126,16 @@ func mergeErrorChans(cs []chan error) <-chan error {
 	}()
 
 	return out
+}
+
+func newMockAuthenticator(token *accessToken) *authenticator {
+	// make buffered accessToken channel an pre-fill it with nil
+	tokenChan := make(chan *accessToken, 1)
+	tokenChan <- token
+
+	// return new authenticator that uses the above accessToken channel
+	return &authenticator{
+		accessTokenChan:     tokenChan,
+		accessTokenProvider: newMockAccessTokenProvider(),
+	}
 }
