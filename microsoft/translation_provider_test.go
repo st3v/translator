@@ -14,8 +14,6 @@ func TestTranslationProviderTranslate(t *testing.T) {
 	expectedFrom := "de"
 	expectedTo := "en"
 
-	authenticator := newMockAuthenticator(newMockAccessToken(100))
-
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
@@ -23,10 +21,6 @@ func TestTranslationProviderTranslate(t *testing.T) {
 
 		if r.Header.Get("Content-Type") != "text/plain" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
-		}
-
-		if r.Header.Get("Authorization") != authenticator.expectedAuthToken(t) {
-			t.Fatalf("Unexpected authorization header for request: %s", r.Header.Get("Authorization"))
 		}
 
 		if r.FormValue("text") != expectedOriginal {
@@ -58,7 +52,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 
 	translationProvider := &translationProvider{
 		router:     router,
-		httpClient: newHTTPClient(authenticator),
+		httpClient: newAuthenticatedHTTPClient(),
 	}
 
 	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo)
@@ -69,4 +63,37 @@ func TestTranslationProviderTranslate(t *testing.T) {
 	if actualTranslation != expectedTranslation {
 		t.Fatalf("Unexpected translatipon: %s. Expected: %s.", actualTranslation, expectedTranslation)
 	}
+}
+
+func newMockTranslationProvider(text, from, to, translation string, t *testing.T) *mockTranslationProvider {
+	return &mockTranslationProvider{
+		text:        text,
+		from:        from,
+		to:          to,
+		translation: translation,
+		t:           t,
+	}
+}
+
+type mockTranslationProvider struct {
+	text        string
+	from        string
+	to          string
+	translation string
+	t           *testing.T
+}
+
+func (p *mockTranslationProvider) Translate(text, from, to string) (string, error) {
+	if p.text != text {
+		p.t.Fatalf("Unexpected text value: `%s`", text)
+	}
+
+	if p.from != from {
+		p.t.Fatalf("Unexpected from value: `%s`", from)
+	}
+
+	if p.to != to {
+		p.t.Fatalf("Unexpected to value: `%s`", to)
+	}
+	return p.translation, nil
 }
