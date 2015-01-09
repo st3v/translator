@@ -6,6 +6,7 @@ const (
 	translationURL   = serviceURL + "Translate"
 	languageNamesURL = serviceURL + "GetLanguageNames"
 	languageCodesURL = serviceURL + "GetLanguagesForTranslate"
+	detectURL        = serviceURL + "Detect"
 )
 
 // The Router provides the necessary URLs to communicate with
@@ -15,6 +16,7 @@ type Router interface {
 	TranslationURL() string
 	LanguageNamesURL() string
 	LanguageCodesURL() string
+	DetectURL() string
 }
 
 type router struct{}
@@ -37,4 +39,8 @@ func (r *router) LanguageNamesURL() string {
 
 func (r *router) LanguageCodesURL() string {
 	return languageCodesURL
+}
+
+func (r *router) DetectURL() string {
+	return detectURL
 }

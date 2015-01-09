@@ -17,4 +17,7 @@ type Translator interface {
 	// to another language. Source and destination languages are specified by their
 	// corresponding language codes.
 	Translate(text, from, to string) (string, error)
+
+	// Detect identifies the language of the given text.
+	Detect(text string) (string, error)
 }

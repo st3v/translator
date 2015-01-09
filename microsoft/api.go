@@ -32,3 +32,7 @@ func (a *api) Translate(text, from, to string) (string, error) {
 func (a *api) Languages() ([]translator.Language, error) {
 	return a.languageCatalog.Languages()
 }
+
+func (a *api) Detect(text string) (string, error) {
+	return a.translationProvider.Detect(text)
+}
