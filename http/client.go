@@ -1,31 +1,30 @@
-package microsoft
+package http
 
 import (
 	"io"
 	"net/http"
 
 	"github.com/st3v/tracerr"
-	msauth "github.com/st3v/translator/microsoft/auth"
 )
 
-// The HTTPClient sends authenticated HTTP requests to Microsoft's Translation API
-type HTTPClient interface {
+// Client sends authenticated HTTP requests to API endpoints
+type Client interface {
 	SendRequest(method, uri string, body io.Reader, contentType string) (*http.Response, error)
 }
 
-type httpClient struct {
+type client struct {
 	client        *http.Client
-	authenticator msauth.Authenticator
+	authenticator Authenticator
 }
 
-func newHTTPClient(authenticator msauth.Authenticator) HTTPClient {
-	return &httpClient{
+func NewClient(authenticator Authenticator) Client {
+	return &client{
 		client:        &http.Client{},
 		authenticator: authenticator,
 	}
 }
 
-func (h *httpClient) SendRequest(method, uri string, body io.Reader, contentType string) (*http.Response, error) {
+func (h *client) SendRequest(method, uri string, body io.Reader, contentType string) (*http.Response, error) {
 	request, err := http.NewRequest(method, uri, body)
 	if err != nil {
 		return nil, tracerr.Wrap(err)

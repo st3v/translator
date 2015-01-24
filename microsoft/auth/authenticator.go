@@ -4,14 +4,8 @@ import (
 	"net/http"
 
 	"github.com/st3v/tracerr"
+	_http "github.com/st3v/translator/http"
 )
-
-// Authenticator is used to authenticate HTTP requests to Microsoft's
-// API endpoints.
-type Authenticator interface {
-	// Authenticate a given HTTP request.
-	Authenticate(request *http.Request) error
-}
 
 type authenticator struct {
 	accessTokenProvider AccessTokenProvider
@@ -19,7 +13,7 @@ type authenticator struct {
 }
 
 // NewAuthenticator returns an autheticator for Microsoft API endpoints.
-func NewAuthenticator(clientID, clientSecret, scope, authURL string) Authenticator {
+func NewAuthenticator(clientID, clientSecret, scope, authURL string) _http.Authenticator {
 	// make buffered accessToken channel and pre-fill it with an expired token
 	tokenChan := make(chan *accessToken, 1)
 	tokenChan <- newAccessToken(scope)

@@ -1,4 +1,4 @@
-package microsoft
+package http
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestHTTPClientSendRequest(t *testing.T) {
+func TestClientSendRequest(t *testing.T) {
 	expectedRequestMethod := "GET"
 	expectedRequestContentType := "fake-content-type"
 	expectedRequestAuthToken := "fake-auth-token"
@@ -28,7 +28,7 @@ func TestHTTPClientSendRequest(t *testing.T) {
 		return nil
 	})
 
-	httpClient := newHTTPClient(authenticator)
+	client := NewClient(authenticator)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != expectedRequestMethod {
@@ -70,7 +70,7 @@ func TestHTTPClientSendRequest(t *testing.T) {
 	}))
 	defer server.Close()
 
-	response, err := httpClient.SendRequest(
+	response, err := client.SendRequest(
 		expectedRequestMethod,
 		server.URL,
 		strings.NewReader(expectedRequestBody),
@@ -103,14 +103,14 @@ func TestHTTPClientSendRequest(t *testing.T) {
 	}
 }
 
-func TestHTTPClientSendRequestAuthenticateError(t *testing.T) {
+func TestClientSendRequestAuthenticateError(t *testing.T) {
 	authenticator := newMockAuthenticator(func(request *http.Request) error {
 		return errors.New("fake-authentication-error")
 	})
 
-	httpClient := newHTTPClient(authenticator)
+	client := NewClient(authenticator)
 
-	_, err := httpClient.SendRequest(
+	_, err := client.SendRequest(
 		"POST",
 		"fake-url",
 		strings.NewReader("fake-body"),
@@ -124,30 +124,4 @@ func TestHTTPClientSendRequestAuthenticateError(t *testing.T) {
 	if !strings.HasPrefix(err.Error(), "fake-authentication-error") {
 		t.Fatalf("Expected fake-authentication-error. Got: %s", err.Error())
 	}
-}
-
-func newAuthenticatedHTTPClient() HTTPClient {
-	authenticator := newMockAuthenticator(func(request *http.Request) error {
-		request.Header.Set("Authorization", "fake-authorization")
-		return nil
-	})
-
-	return newHTTPClient(authenticator)
-}
-
-func newMockAuthenticator(authenticate func(request *http.Request) error) *mockAuthenticator {
-	return &mockAuthenticator{
-		authenticate: authenticate,
-	}
-}
-
-type mockAuthenticator struct {
-	authenticate func(request *http.Request) error
-}
-
-func (a *mockAuthenticator) Authenticate(request *http.Request) error {
-	if a.authenticate != nil {
-		return a.authenticate(request)
-	}
-	return nil
 }

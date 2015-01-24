@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	_http "github.com/st3v/translator/http"
 )
 
 func TestTranslationProviderTranslate(t *testing.T) {
@@ -52,7 +54,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 
 	translationProvider := &translationProvider{
 		router:     router,
-		httpClient: newAuthenticatedHTTPClient(),
+		httpClient: _http.NewAuthenticatedClient(),
 	}
 
 	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo)

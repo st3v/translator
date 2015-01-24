@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/st3v/tracerr"
-	msauth "github.com/st3v/translator/microsoft/auth"
+	"github.com/st3v/translator/http"
 )
 
 // The TranslationProvider communicates with Microsoft's
@@ -18,13 +18,13 @@ type TranslationProvider interface {
 
 type translationProvider struct {
 	router     Router
-	httpClient HTTPClient
+	httpClient http.Client
 }
 
-func newTranslationProvider(authenticator msauth.Authenticator, router Router) TranslationProvider {
+func newTranslationProvider(authenticator http.Authenticator, router Router) TranslationProvider {
 	return &translationProvider{
 		router:     router,
-		httpClient: newHTTPClient(authenticator),
+		httpClient: http.NewClient(authenticator),
 	}
 }
 

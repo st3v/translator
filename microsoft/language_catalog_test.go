@@ -6,7 +6,7 @@ func TestLanguageCatalogLanguages(t *testing.T) {
 	expectedCodes := []string{"en", "de", "es", "ru", "jp"}
 	expectedNames := []string{"English", "German", "Spanish", "Russian", "Japanese"}
 
-	// intantiate language catalog and inject mocked out language provider
+	// instantiate language catalog and inject mocked out language provider
 	languageProvider := newMockLanguageProvider()
 	languageProvider.codes = expectedCodes
 	languageProvider.names = expectedNames

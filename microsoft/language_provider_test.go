@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	_http "github.com/st3v/translator/http"
 )
 
 func TestLanguageProviderCodes(t *testing.T) {
@@ -38,7 +40,7 @@ func TestLanguageProviderCodes(t *testing.T) {
 
 	languageProvider := &languageProvider{
 		router:     router,
-		httpClient: newAuthenticatedHTTPClient(),
+		httpClient: _http.NewAuthenticatedClient(),
 	}
 
 	actualCodes, err := languageProvider.Codes()
@@ -108,7 +110,7 @@ func TestLanguageProviderNames(t *testing.T) {
 
 	languageProvider := &languageProvider{
 		router:     router,
-		httpClient: newAuthenticatedHTTPClient(),
+		httpClient: _http.NewAuthenticatedClient(),
 	}
 
 	actualNames, err := languageProvider.Names(expectedCodes)

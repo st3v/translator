@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/st3v/tracerr"
-	msauth "github.com/st3v/translator/microsoft/auth"
+	"github.com/st3v/translator/http"
 )
 
 // The LanguageProvider retrieves the names and codes of all languages
@@ -18,13 +18,13 @@ type LanguageProvider interface {
 
 type languageProvider struct {
 	router     Router
-	httpClient HTTPClient
+	httpClient http.Client
 }
 
-func newLanguageProvider(authenticator msauth.Authenticator, router Router) LanguageProvider {
+func newLanguageProvider(authenticator http.Authenticator, router Router) LanguageProvider {
 	return &languageProvider{
 		router:     router,
-		httpClient: newHTTPClient(authenticator),
+		httpClient: http.NewClient(authenticator),
 	}
 }
 
