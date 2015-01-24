@@ -67,3 +67,23 @@ func TestApiLanguages(t *testing.T) {
 		}
 	}
 }
+
+func TestDetect(t *testing.T) {
+	text := "Mein Englisch ist unter aller Sau."
+	expectedLanguage := "de"
+	from := "de"
+
+	api := &api{
+		translationProvider: newMockTranslationProvider(text, from, "", "", t),
+	}
+
+	actualLanguage, err := api.Detect(text)
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err.Error())
+	}
+
+	if actualLanguage != expectedLanguage {
+		t.Errorf("api.Detect(`%v`) failed:\n\twant: %v\n\t got: %v",
+			text, expectedLanguage, actualLanguage)
+	}
+}

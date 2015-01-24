@@ -99,3 +99,7 @@ func (p *mockTranslationProvider) Translate(text, from, to string) (string, erro
 	}
 	return p.translation, nil
 }
+
+func (p *mockTranslationProvider) Detect(text string) (string, error) {
+	return p.from, nil
+}
