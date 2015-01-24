@@ -4,6 +4,7 @@ const (
 	authURL          = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
 	serviceURL       = "http://api.microsofttranslator.com/v2/Http.svc/"
 	translationURL   = serviceURL + "Translate"
+	detectURL        = serviceURL + "Detect"
 	languageNamesURL = serviceURL + "GetLanguageNames"
 	languageCodesURL = serviceURL + "GetLanguagesForTranslate"
 )
@@ -13,6 +14,7 @@ const (
 type Router interface {
 	AuthURL() string
 	TranslationURL() string
+	DetectURL() string
 	LanguageNamesURL() string
 	LanguageCodesURL() string
 }
@@ -29,6 +31,10 @@ func (r *router) AuthURL() string {
 
 func (r *router) TranslationURL() string {
 	return translationURL
+}
+
+func (r *router) DetectURL() string {
+	return detectURL
 }
 
 func (r *router) LanguageNamesURL() string {

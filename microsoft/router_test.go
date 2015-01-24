@@ -56,6 +56,7 @@ func newMockRouter() *mockRouter {
 		translationURL:   "translation",
 		languageNamesURL: "languages_names",
 		languageCodesURL: "languages_codes",
+		detectURL:        "detect",
 	}
 }
 
@@ -64,6 +65,7 @@ type mockRouter struct {
 	translationURL   string
 	languageNamesURL string
 	languageCodesURL string
+	detectURL        string
 }
 
 func (m *mockRouter) AuthURL() string {
@@ -80,4 +82,8 @@ func (m *mockRouter) LanguageNamesURL() string {
 
 func (m *mockRouter) LanguageCodesURL() string {
 	return m.languageCodesURL
+}
+
+func (m *mockRouter) DetectURL() string {
+	return m.detectURL
 }

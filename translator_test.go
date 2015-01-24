@@ -17,3 +17,7 @@ func (t *testTranslator) Languages() ([]Language, error) {
 func (t *testTranslator) Translate(text, from, to string) (string, error) {
 	return "", nil
 }
+
+func (t *testTranslator) Detect(text string) (string, error) {
+	return "", nil
+}
