@@ -6,7 +6,7 @@ import (
 	"github.com/st3v/translator"
 )
 
-func TestTranslate(t *testing.T) {
+func TestAPITranslate(t *testing.T) {
 	original := "Mein Englisch ist unter aller Sau."
 	expectedTranslation := "My English is under all pig."
 	from := "de"
@@ -26,7 +26,7 @@ func TestTranslate(t *testing.T) {
 	}
 }
 
-func TestApiLanguages(t *testing.T) {
+func TestAPILanguages(t *testing.T) {
 	expectedLanguages := []translator.Language{
 		translator.Language{
 			Code: "en",
@@ -68,7 +68,7 @@ func TestApiLanguages(t *testing.T) {
 	}
 }
 
-func TestDetect(t *testing.T) {
+func TestAPIDetect(t *testing.T) {
 	text := "Mein Englisch ist unter aller Sau."
 	expectedLanguage := "de"
 	from := "de"
