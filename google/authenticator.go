@@ -11,7 +11,7 @@ type authenticator struct {
 }
 
 // NewAuthenticator instantiates a new Authenticator for Google's Translate API.
-func NewAuthenticator(apiKey string) _http.Authenticator {
+func newAuthenticator(apiKey string) _http.Authenticator {
 	return &authenticator{
 		apiKey: apiKey,
 	}

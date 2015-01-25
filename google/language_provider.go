@@ -30,7 +30,7 @@ type languageProvider struct {
 	catalog       []translator.Language
 }
 
-func NewLanguageProvider(a http.Authenticator, r Router) LanguageProvider {
+func newLanguageProvider(a http.Authenticator, r Router) LanguageProvider {
 	return &languageProvider{
 		router:        r,
 		authenticator: a,

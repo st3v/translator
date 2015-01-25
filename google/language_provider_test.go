@@ -17,7 +17,7 @@ func TestLanguages(t *testing.T) {
 		{"zh-TW", "Chinese (Traditional)"},
 	}
 
-	authenticator := NewAuthenticator(expectedAPIKey)
+	authenticator := newAuthenticator(expectedAPIKey)
 
 	requestCounter := 0
 
@@ -57,7 +57,7 @@ func TestLanguages(t *testing.T) {
 
 	router := &router{languagesURL: server.URL}
 
-	provider := NewLanguageProvider(authenticator, router)
+	provider := newLanguageProvider(authenticator, router)
 	languages, err := provider.Languages()
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())

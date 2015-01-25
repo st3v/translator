@@ -8,7 +8,7 @@ import (
 
 func TestAuthenticate(t *testing.T) {
 	apiKey := "my-secret-api-key"
-	authenticator := NewAuthenticator(apiKey)
+	authenticator := newAuthenticator(apiKey)
 
 	host := "localhost:6666"
 	params := "one=1&two=2"
