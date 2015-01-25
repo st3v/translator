@@ -17,6 +17,7 @@ type client struct {
 	authenticator Authenticator
 }
 
+// NewClient instantiates a Client and initializes it with the passed Authenticator.
 func NewClient(authenticator Authenticator) Client {
 	return &client{
 		client:        &http.Client{},
