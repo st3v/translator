@@ -94,5 +94,71 @@ func TestLanguages(t *testing.T) {
 	if requestCounter != 1 {
 		t.Errorf("Expected 1 http request but counted %d.", requestCounter)
 	}
+}
 
+func TestDetect(t *testing.T) {
+	expectedAPIKey := "my-secret-key"
+
+	expectedText := "foo"
+	expectedLanguageCode := "bar"
+
+	authenticator := newAuthenticator(expectedAPIKey)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Fatalf("Unexpected request method: %s", r.Method)
+		}
+
+		if r.Header.Get("Content-Type") != "text/plain" {
+			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
+		}
+
+		if r.FormValue("key") != expectedAPIKey {
+			t.Fatalf("Unexpected `key` param in request. Got: %s. Want: %s", r.FormValue("key"), expectedAPIKey)
+		}
+
+		if r.FormValue("q") != expectedText {
+			t.Fatalf("Unexpected `q` param in request. Got: %s. Want: %s", r.FormValue("q"), expectedText)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		jsonPayload := fmt.Sprintf(`
+			{
+				"data": {
+					"detections": [
+						[
+							{
+								"language": "%s",
+								"isReliable": false,
+								"confidence": 0.66
+							}
+						]
+					]
+				}
+			}
+		`, expectedLanguageCode)
+
+		fmt.Fprint(w, jsonPayload)
+		return
+	}))
+	defer server.Close()
+
+	router := &router{detectURL: server.URL}
+
+	provider := newLanguageProvider(authenticator, router)
+
+	languageCode, err := provider.Detect(expectedText)
+
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err.Error())
+	}
+
+	if languageCode != expectedLanguageCode {
+		t.Errorf(
+			"Unexpected language code. Got: %s. Want: %s.",
+			languageCode,
+			expectedLanguageCode,
+		)
+	}
 }

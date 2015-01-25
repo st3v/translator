@@ -2,6 +2,7 @@ package google
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/st3v/tracerr"
 	"github.com/st3v/translator"
@@ -17,9 +18,18 @@ type languagesPayload struct {
 	}
 }
 
+type detectionPayload struct {
+	Data struct {
+		Detections [][]struct {
+			Language string
+		}
+	}
+}
+
 // LanguageProvider retrieves all languages supported by Google's Translate API.
 type LanguageProvider interface {
 	Languages() ([]translator.Language, error)
+	Detect(string) (string, error)
 }
 
 type languageProvider struct {
@@ -56,13 +66,13 @@ func (p *languageProvider) Languages() ([]translator.Language, error) {
 			return nil, tracerr.Wrap(err)
 		}
 
-		lr, ok := result.(*languagesPayload)
+		payload, ok := result.(*languagesPayload)
 		if !ok {
 			return nil, tracerr.Error("Invalid response.")
 		}
 
-		p.catalog = make([]translator.Language, len(lr.Data.Languages))
-		for i, l := range lr.Data.Languages {
+		p.catalog = make([]translator.Language, len(payload.Data.Languages))
+		for i, l := range payload.Data.Languages {
 			p.catalog[i] = translator.Language{
 				Code: l.Language,
 				Name: l.Name,
@@ -71,4 +81,31 @@ func (p *languageProvider) Languages() ([]translator.Language, error) {
 	}
 
 	return p.catalog, nil
+}
+
+func (p *languageProvider) Detect(text string) (string, error) {
+	httpClient := http.NewClient(p.authenticator)
+
+	resp, err := httpClient.SendRequest(
+		"GET",
+		fmt.Sprintf("%s?q=%s", p.router.DetectURL(), url.QueryEscape(text)),
+		nil,
+		"text/plain",
+	)
+
+	if err != nil {
+		return "", tracerr.Wrap(err)
+	}
+
+	result, err := parseResponse(resp, &detectionPayload{})
+	if err != nil {
+		return "", tracerr.Wrap(err)
+	}
+
+	payload, ok := result.(*detectionPayload)
+	if !ok {
+		return "", tracerr.Error("Invalid response.")
+	}
+
+	return payload.Data.Detections[0][0].Language, nil
 }

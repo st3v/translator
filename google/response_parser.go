@@ -8,7 +8,7 @@ import (
 	"github.com/st3v/tracerr"
 )
 
-type errorResult struct {
+type errorPayload struct {
 	Error struct {
 		Errors []struct {
 			Domain  string
@@ -27,19 +27,19 @@ var parseResponse = func(resp *http.Response, target interface{}) (interface{}, 
 		return nil, tracerr.Wrap(err)
 	}
 
-	errorResult := &errorResult{}
-	err = json.Unmarshal(body, errorResult)
+	errorPayload := &errorPayload{}
+	err = json.Unmarshal(body, errorPayload)
 	if err != nil {
 		return nil, tracerr.Wrap(err)
 	}
 
-	if errorResult.Error.Code != 0 {
+	if errorPayload.Error.Code != 0 {
 		return nil, tracerr.Errorf(
 			"API Error. Code: %d, Message: %s, Domain: %s, Reason: %s",
-			errorResult.Error.Code,
-			errorResult.Error.Message,
-			errorResult.Error.Errors[0].Domain,
-			errorResult.Error.Errors[0].Reason,
+			errorPayload.Error.Code,
+			errorPayload.Error.Message,
+			errorPayload.Error.Errors[0].Domain,
+			errorPayload.Error.Errors[0].Reason,
 		)
 	}
 

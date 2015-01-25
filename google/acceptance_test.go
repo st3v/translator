@@ -37,6 +37,29 @@ func TestTranslateAcceptance(t *testing.T) {
 	}
 }
 
+func TestDetectAcceptance(t *testing.T) {
+	authenticator := newAuthenticator(apiKey(t))
+
+	provider := newLanguageProvider(authenticator, newRouter())
+
+	languageCode, err := provider.Detect("¿cómo está?")
+
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err.Error())
+	}
+
+	expectedCode := "es"
+
+	if languageCode != expectedCode {
+		t.Errorf(
+			"Unexpected language detected. Got: %s. Want: %s.",
+			languageCode,
+			expectedCode,
+		)
+	}
+
+}
+
 func TestLanguagesAcceptance(t *testing.T) {
 	authenticator := newAuthenticator(apiKey(t))
 
