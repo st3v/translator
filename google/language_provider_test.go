@@ -55,7 +55,7 @@ func TestLanguages(t *testing.T) {
 	}))
 	defer server.Close()
 
-	router := &router{languagesURL: server.URL}
+	router := &router{languagesEndpoint: server.URL}
 
 	provider := newLanguageProvider(authenticator, router)
 	languages, err := provider.Languages()
@@ -144,7 +144,7 @@ func TestDetect(t *testing.T) {
 	}))
 	defer server.Close()
 
-	router := &router{detectURL: server.URL}
+	router := &router{detectEndpoint: server.URL}
 
 	provider := newLanguageProvider(authenticator, router)
 

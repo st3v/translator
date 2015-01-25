@@ -33,12 +33,12 @@ type LanguageProvider interface {
 }
 
 type languageProvider struct {
-	router        Router
+	router        *router
 	authenticator http.Authenticator
 	catalog       []translator.Language
 }
 
-func newLanguageProvider(a http.Authenticator, r Router) LanguageProvider {
+func newLanguageProvider(a http.Authenticator, r *router) LanguageProvider {
 	return &languageProvider{
 		router:        r,
 		authenticator: a,
@@ -52,7 +52,7 @@ func (p *languageProvider) Languages() ([]translator.Language, error) {
 
 		resp, err := httpClient.SendRequest(
 			"GET",
-			fmt.Sprintf("%s?target=en", p.router.LanguagesURL()),
+			fmt.Sprintf("%s?target=en", p.router.languagesURL()),
 			nil,
 			"text/plain",
 		)
@@ -88,7 +88,7 @@ func (p *languageProvider) Detect(text string) (string, error) {
 
 	resp, err := httpClient.SendRequest(
 		"GET",
-		fmt.Sprintf("%s?q=%s", p.router.DetectURL(), url.QueryEscape(text)),
+		fmt.Sprintf("%s?q=%s", p.router.detectURL(), url.QueryEscape(text)),
 		nil,
 		"text/plain",
 	)

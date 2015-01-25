@@ -54,7 +54,7 @@ func TestTranslate(t *testing.T) {
 	defer server.Close()
 
 	authenticator := newAuthenticator(expectedAPIKey)
-	router := &router{translateURL: server.URL}
+	router := &router{translateEndpoint: server.URL}
 	provider := newTranslationProvider(authenticator, router)
 
 	actualTranslation, err := provider.Translate(expectedOriginal, expectedSource, expectedTarget)

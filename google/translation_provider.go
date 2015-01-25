@@ -18,10 +18,10 @@ type translationPayload struct {
 
 type translationProvider struct {
 	authenticator http.Authenticator
-	router        Router
+	router        *router
 }
 
-func newTranslationProvider(a http.Authenticator, r Router) *translationProvider {
+func newTranslationProvider(a http.Authenticator, r *router) *translationProvider {
 	return &translationProvider{
 		authenticator: a,
 		router:        r,
@@ -33,7 +33,7 @@ func (t *translationProvider) Translate(text, from, to string) (string, error) {
 
 	uri := fmt.Sprintf(
 		"%s?q=%s&source=%s&target=%s",
-		t.router.TranslateURL(),
+		t.router.translateURL(),
 		url.QueryEscape(text),
 		url.QueryEscape(from),
 		url.QueryEscape(to))

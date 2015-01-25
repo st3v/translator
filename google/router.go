@@ -1,37 +1,30 @@
 package google
 
-// The Router provides necessary URLs to communicate with Google's Translate API
-type Router interface {
-	LanguagesURL() string
-	TranslateURL() string
-	DetectURL() string
-}
-
 const baseURL = "https://www.googleapis.com/language/translate/v2/"
 
 type router struct {
-	baseURL      string
-	languagesURL string
-	translateURL string
-	detectURL    string
+	baseURL           string
+	languagesEndpoint string
+	translateEndpoint string
+	detectEndpoint    string
 }
 
-func newRouter() Router {
+func newRouter() *router {
 	return &router{
-		languagesURL: baseURL + "languages",
-		detectURL:    baseURL + "detect",
-		translateURL: baseURL,
+		languagesEndpoint: baseURL + "languages",
+		detectEndpoint:    baseURL + "detect",
+		translateEndpoint: baseURL,
 	}
 }
 
-func (r *router) LanguagesURL() string {
-	return r.languagesURL
+func (r *router) languagesURL() string {
+	return r.languagesEndpoint
 }
 
-func (r *router) TranslateURL() string {
-	return r.translateURL
+func (r *router) translateURL() string {
+	return r.translateEndpoint
 }
 
-func (r *router) DetectURL() string {
-	return r.detectURL
+func (r *router) detectURL() string {
+	return r.detectEndpoint
 }
