@@ -16,11 +16,8 @@ func apiKey(t *testing.T) string {
 }
 
 func TestTranslateAcceptance(t *testing.T) {
-	authenticator := newAuthenticator(apiKey(t))
-
-	provider := newTranslationProvider(authenticator, newRouter())
-
-	translation, err := provider.translate("Hello World!", "en", "de")
+	translator := NewTranslator(apiKey(t))
+	translation, err := translator.Translate("Hello World!", "en", "de")
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
@@ -38,11 +35,8 @@ func TestTranslateAcceptance(t *testing.T) {
 }
 
 func TestDetectAcceptance(t *testing.T) {
-	authenticator := newAuthenticator(apiKey(t))
-
-	provider := newLanguageProvider(authenticator, newRouter())
-
-	languageCode, err := provider.detect("¿cómo está?")
+	translator := NewTranslator(apiKey(t))
+	languageCode, err := translator.Detect("¿cómo está?")
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
@@ -61,11 +55,8 @@ func TestDetectAcceptance(t *testing.T) {
 }
 
 func TestLanguagesAcceptance(t *testing.T) {
-	authenticator := newAuthenticator(apiKey(t))
-
-	provider := newLanguageProvider(authenticator, newRouter())
-
-	languages, err := provider.languages()
+	translator := NewTranslator(apiKey(t))
+	languages, err := translator.Languages()
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
