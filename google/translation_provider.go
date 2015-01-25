@@ -16,19 +16,23 @@ type translationPayload struct {
 	}
 }
 
-type translationProvider struct {
+type translationProvider interface {
+	translate(text, from, to string) (string, error)
+}
+
+type concreteTranslationProvider struct {
 	authenticator http.Authenticator
 	router        *router
 }
 
-func newTranslationProvider(a http.Authenticator, r *router) *translationProvider {
-	return &translationProvider{
+func newTranslationProvider(a http.Authenticator, r *router) *concreteTranslationProvider {
+	return &concreteTranslationProvider{
 		authenticator: a,
 		router:        r,
 	}
 }
 
-func (t *translationProvider) Translate(text, from, to string) (string, error) {
+func (t *concreteTranslationProvider) translate(text, from, to string) (string, error) {
 	httpClient := http.NewClient(t.authenticator)
 
 	uri := fmt.Sprintf(

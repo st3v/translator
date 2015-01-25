@@ -26,27 +26,26 @@ type detectionPayload struct {
 	}
 }
 
-// LanguageProvider retrieves all languages supported by Google's Translate API.
-type LanguageProvider interface {
-	Languages() ([]translator.Language, error)
-	Detect(string) (string, error)
+type languageProvider interface {
+	languages() ([]translator.Language, error)
+	detect(text string) (string, error)
 }
 
-type languageProvider struct {
+type concreteLanguageProvider struct {
 	router        *router
 	authenticator http.Authenticator
 	catalog       []translator.Language
 }
 
-func newLanguageProvider(a http.Authenticator, r *router) LanguageProvider {
-	return &languageProvider{
+func newLanguageProvider(a http.Authenticator, r *router) *concreteLanguageProvider {
+	return &concreteLanguageProvider{
 		router:        r,
 		authenticator: a,
 		catalog:       nil,
 	}
 }
 
-func (p *languageProvider) Languages() ([]translator.Language, error) {
+func (p *concreteLanguageProvider) languages() ([]translator.Language, error) {
 	if p.catalog == nil {
 		httpClient := http.NewClient(p.authenticator)
 
@@ -83,7 +82,7 @@ func (p *languageProvider) Languages() ([]translator.Language, error) {
 	return p.catalog, nil
 }
 
-func (p *languageProvider) Detect(text string) (string, error) {
+func (p *concreteLanguageProvider) detect(text string) (string, error) {
 	httpClient := http.NewClient(p.authenticator)
 
 	resp, err := httpClient.SendRequest(

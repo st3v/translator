@@ -58,7 +58,7 @@ func TestLanguages(t *testing.T) {
 	router := &router{languagesEndpoint: server.URL}
 
 	provider := newLanguageProvider(authenticator, router)
-	languages, err := provider.Languages()
+	languages, err := provider.languages()
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
 	}
@@ -148,7 +148,7 @@ func TestDetect(t *testing.T) {
 
 	provider := newLanguageProvider(authenticator, router)
 
-	languageCode, err := provider.Detect(expectedText)
+	languageCode, err := provider.detect(expectedText)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())

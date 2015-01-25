@@ -57,7 +57,7 @@ func TestTranslate(t *testing.T) {
 	router := &router{translateEndpoint: server.URL}
 	provider := newTranslationProvider(authenticator, router)
 
-	actualTranslation, err := provider.Translate(expectedOriginal, expectedSource, expectedTarget)
+	actualTranslation, err := provider.translate(expectedOriginal, expectedSource, expectedTarget)
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
 	}
