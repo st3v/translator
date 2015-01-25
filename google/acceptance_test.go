@@ -5,14 +5,40 @@ import (
 	"testing"
 )
 
-func TestLanguagesAcceptance(t *testing.T) {
+func apiKey(t *testing.T) string {
 	apiKey := os.Getenv("GOOGLE_API_KEY")
 
 	if apiKey == "" {
-		t.Skip("Skipping languages acceptance test for Google. Set environment variable GOOGLE_API_KEY.")
+		t.Skip("Skipping acceptance tests for Google. Set environment variable GOOGLE_API_KEY.")
 	}
 
-	authenticator := newAuthenticator(apiKey)
+	return apiKey
+}
+
+func TestTranslateAcceptance(t *testing.T) {
+	authenticator := newAuthenticator(apiKey(t))
+
+	provider := newTranslationProvider(authenticator, newRouter())
+
+	translation, err := provider.Translate("Hello World!", "en", "de")
+
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err.Error())
+	}
+
+	expectedTranslation := "Hallo Welt!"
+
+	if translation != expectedTranslation {
+		t.Errorf(
+			"Unexpected translation. Got: '%s'. Want: '%s'.",
+			translation,
+			expectedTranslation,
+		)
+	}
+}
+
+func TestLanguagesAcceptance(t *testing.T) {
+	authenticator := newAuthenticator(apiKey(t))
 
 	provider := newLanguageProvider(authenticator, newRouter())
 
