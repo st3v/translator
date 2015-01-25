@@ -41,9 +41,9 @@ func TestLanguages(t *testing.T) {
 			t.Fatalf("Unexpected `target` param in request. Got: %s. Want: %s", r.FormValue("target"), expectedTarget)
 		}
 
-		result := jsonResult{}
+		result := languagesPayload{}
 		result.Data.Languages = expectedLanguages
-		response, err := json.Marshal(jsonResult(result))
+		response, err := json.Marshal(languagesPayload(result))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling json repsonse: %s", err.Error())
 		}

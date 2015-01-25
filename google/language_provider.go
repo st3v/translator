@@ -10,7 +10,7 @@ import (
 	"github.com/st3v/translator/http"
 )
 
-type jsonResult struct {
+type languagesPayload struct {
 	Data struct {
 		Languages []struct {
 			Language string
@@ -59,7 +59,7 @@ func (p *languageProvider) Languages() ([]translator.Language, error) {
 			return nil, tracerr.Wrap(err)
 		}
 
-		result := &jsonResult{}
+		result := &languagesPayload{}
 		err = json.Unmarshal(body, result)
 		if err != nil {
 			return nil, tracerr.Wrap(err)
