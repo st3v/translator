@@ -9,7 +9,7 @@ const (
 	languageCodesURL = serviceURL + "GetLanguagesForTranslate"
 )
 
-// The Router provides the necessary URLs to communicate with
+// The Router provides necessary URLs to communicate with
 // Microsoft's API.
 type Router interface {
 	AuthURL() string
