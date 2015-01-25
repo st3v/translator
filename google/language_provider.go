@@ -1,9 +1,7 @@
 package google
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/st3v/tracerr"
 	"github.com/st3v/translator"
@@ -53,20 +51,18 @@ func (p *languageProvider) Languages() ([]translator.Language, error) {
 			return nil, tracerr.Wrap(err)
 		}
 
-		body, err := ioutil.ReadAll(resp.Body)
-		defer resp.Body.Close()
+		result, err := parseResponse(resp, &languagesPayload{})
 		if err != nil {
 			return nil, tracerr.Wrap(err)
 		}
 
-		result := &languagesPayload{}
-		err = json.Unmarshal(body, result)
-		if err != nil {
-			return nil, tracerr.Wrap(err)
+		lr, ok := result.(*languagesPayload)
+		if !ok {
+			return nil, tracerr.Error("Invalid response.")
 		}
 
-		p.catalog = make([]translator.Language, len(result.Data.Languages))
-		for i, l := range result.Data.Languages {
+		p.catalog = make([]translator.Language, len(lr.Data.Languages))
+		for i, l := range lr.Data.Languages {
 			p.catalog[i] = translator.Language{
 				Code: l.Language,
 				Name: l.Name,
