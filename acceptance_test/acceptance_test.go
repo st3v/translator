@@ -1,11 +1,48 @@
-package google
+package acceptance_test
 
 import (
 	"os"
 	"testing"
+
+	"github.com/st3v/translator"
+	"github.com/st3v/translator/google"
+	"github.com/st3v/translator/microsoft"
 )
 
-func apiKey(t *testing.T) string {
+func TestAcceptanceGoogleTranslate(t *testing.T) {
+	testTranslate(t, googleTranslator(t))
+}
+
+func TestAcceptanceGoogleDetect(t *testing.T) {
+	testDetect(t, googleTranslator(t))
+}
+
+func TestAcceptanceGoogleLanguages(t *testing.T) {
+	testLanguages(t, googleTranslator(t))
+}
+
+func TestAcceptanceMicrosoftTranslate(t *testing.T) {
+	testTranslate(t, microsoftTranslator(t))
+}
+
+func TestAcceptanceMicrosoftDetect(t *testing.T) {
+	testDetect(t, microsoftTranslator(t))
+}
+
+func TestAcceptanceMicrosoftLanguages(t *testing.T) {
+	testLanguages(t, microsoftTranslator(t))
+}
+
+func googleTranslator(t *testing.T) translator.Translator {
+	return google.NewTranslator(googleAPIKey(t))
+}
+
+func microsoftTranslator(t *testing.T) translator.Translator {
+	clientID, clientSecret := microsoftCredentials(t)
+	return microsoft.NewTranslator(clientID, clientSecret)
+}
+
+func googleAPIKey(t *testing.T) string {
 	apiKey := os.Getenv("GOOGLE_API_KEY")
 
 	if apiKey == "" {
@@ -15,8 +52,18 @@ func apiKey(t *testing.T) string {
 	return apiKey
 }
 
-func TestTranslateAcceptance(t *testing.T) {
-	translator := NewTranslator(apiKey(t))
+func microsoftCredentials(t *testing.T) (string, string) {
+	clientID := os.Getenv("MS_CLIENT_ID")
+	clientSecret := os.Getenv("MS_CLIENT_SECRET")
+
+	if clientID == "" || clientSecret == "" {
+		t.Skip("Skipping acceptance tests for Microsoft. Set environment variables MS_CLIENT_ID and MS_CLIENT_SECRET.")
+	}
+
+	return clientID, clientSecret
+}
+
+func testTranslate(t *testing.T, translator translator.Translator) {
 	translation, err := translator.Translate("Hello World!", "en", "de")
 
 	if err != nil {
@@ -34,8 +81,7 @@ func TestTranslateAcceptance(t *testing.T) {
 	}
 }
 
-func TestDetectAcceptance(t *testing.T) {
-	translator := NewTranslator(apiKey(t))
+func testDetect(t *testing.T, translator translator.Translator) {
 	languageCode, err := translator.Detect("¿cómo está?")
 
 	if err != nil {
@@ -51,11 +97,9 @@ func TestDetectAcceptance(t *testing.T) {
 			expectedCode,
 		)
 	}
-
 }
 
-func TestLanguagesAcceptance(t *testing.T) {
-	translator := NewTranslator(apiKey(t))
+func testLanguages(t *testing.T, translator translator.Translator) {
 	languages, err := translator.Languages()
 
 	if err != nil {
@@ -75,8 +119,6 @@ func TestLanguagesAcceptance(t *testing.T) {
 		{"pt", "Portuguese"},
 		{"ja", "Japanese"},
 		{"ko", "Korean"},
-		{"zh", "Chinese (Simplified)"},
-		{"zh-TW", "Chinese (Traditional)"},
 		{"ru", "Russian"},
 	}
 
