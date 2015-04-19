@@ -26,7 +26,9 @@ below.
 package main
 
 import (
+  "fmt"
   "log"
+
   "github.com/st3v/translator/microsoft"
 )
 
@@ -52,7 +54,9 @@ as show below.
 package main
 
 import (
+  "fmt"
   "log"
+
   "github.com/st3v/translator/google"
 )
 
