@@ -42,6 +42,10 @@ func (p *accessTokenProvider) RefreshToken(token *accessToken) error {
 		return tracerr.Wrap(err)
 	}
 
+	if response.StatusCode != http.StatusOK {
+		return tracerr.Errorf("Unexpected Status Code: %d", response.StatusCode)
+	}
+
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
