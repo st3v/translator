@@ -13,11 +13,12 @@ type Translator interface {
 	// by the given translator.
 	Languages() ([]Language, error)
 
-	// Transalate takes a string in a given language and returns its translation
+	// Translate takes a string in a given language and returns its translation
 	// to another language. Source and destination languages are specified by their
 	// corresponding language codes.
 	Translate(text, from, to string) (string, error)
 
-	// Detect identifies the language of the given text.
+	// Detect identifies the language of the given text and returns the
+	// corresponding language code.
 	Detect(text string) (string, error)
 }
