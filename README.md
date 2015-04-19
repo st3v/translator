@@ -97,6 +97,11 @@ Translate(text, from, to string) (string, error)
 
 ```go
 translation, err := translator.Translate("Hello World!", "en", "de")
+if err != nil {
+  log.Panicf("Error during translation: %s", err.Error())
+}
+
+fmt.Printf("Translation: %s\n", translation)
 ```
 
 ## Language Detection
@@ -115,6 +120,11 @@ Detect(text string) (string, error)
 
 ```go
 languageCode, err := translator.Detect("¿cómo está?")
+if err != nil {
+  log.Panicf("Error detecting language: %s", err.Error())
+}
+
+fmt.Printf("Detected language code: %s", languageCode)
 ```
 
 ## Supported Languages
@@ -136,6 +146,13 @@ Languages() ([]Language, error)
 
 ```go
 languages, err := translator.Languages()
+if err != nil {
+  log.Panicf("Error getting supported languages: %s", err.Error())
+}
+
+for _, language := range languages {
+  fmt.Printf("%s (%s)\n", language.Name, language.Code)
+}
 ```
 
 ## Licensing
