@@ -1,8 +1,8 @@
 package microsoft
 
 const (
-	authURL          = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-	serviceURL       = "http://api.microsofttranslator.com/v2/Http.svc/"
+	authURL          = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
+	serviceURL       = "https://api.microsofttranslator.com/v2/Http.svc/"
 	translationURL   = serviceURL + "Translate"
 	detectURL        = serviceURL + "Detect"
 	languageNamesURL = serviceURL + "GetLanguageNames"
