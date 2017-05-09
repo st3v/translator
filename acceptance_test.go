@@ -34,33 +34,23 @@ func TestAcceptanceMicrosoftLanguages(t *testing.T) {
 }
 
 func googleTranslator(t *testing.T) translator.Translator {
-	return google.NewTranslator(googleAPIKey(t))
-}
+	key := os.Getenv("GOOGLE_API_KEY")
 
-func microsoftTranslator(t *testing.T) translator.Translator {
-	clientID, clientSecret := microsoftCredentials(t)
-	return microsoft.NewTranslator(clientID, clientSecret)
-}
-
-func googleAPIKey(t *testing.T) string {
-	apiKey := os.Getenv("GOOGLE_API_KEY")
-
-	if apiKey == "" {
+	if key == "" {
 		t.Skip("Skipping acceptance tests for Google. Set environment variable GOOGLE_API_KEY.")
 	}
 
-	return apiKey
+	return google.NewTranslator(key)
 }
 
-func microsoftCredentials(t *testing.T) (string, string) {
-	clientID := os.Getenv("MS_CLIENT_ID")
-	clientSecret := os.Getenv("MS_CLIENT_SECRET")
+func microsoftTranslator(t *testing.T) translator.Translator {
+	key := os.Getenv("MS_SUBSCRIPTION_KEY")
 
-	if clientID == "" || clientSecret == "" {
-		t.Skip("Skipping acceptance tests for Microsoft. Set environment variables MS_CLIENT_ID and MS_CLIENT_SECRET.")
+	if key == "" {
+		t.Skip("Skipping acceptance tests for Microsoft. Set environment variables MS_SUBSCRIPTION_KEY.")
 	}
 
-	return clientID, clientSecret
+	return microsoft.NewTranslator(key)
 }
 
 func testTranslate(t *testing.T, translator translator.Translator) {

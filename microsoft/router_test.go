@@ -5,48 +5,48 @@ import "testing"
 func TestRouterAuthURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
+	expectedURL := "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
 
 	actualURL := router.AuthURL()
 
 	if actualURL != expectedURL {
-		t.Fatalf("Unexpected AuthURL. Want: '%s'. Got: '%s'.", expectedURL, actualURL)
+		t.Fatalf("Unexpected AuthURL. Want: %q. Got: %q.", expectedURL, actualURL)
 	}
 }
 
 func TestRouterTranslationURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "http://api.microsofttranslator.com/v2/Http.svc/Translate"
+	expectedURL := "https://api.microsofttranslator.com/v2/Http.svc/Translate"
 
 	actualURL := router.TranslationURL()
 
 	if actualURL != expectedURL {
-		t.Fatalf("Unexpected AuthURL. Want: '%s'. Got: '%s'.", expectedURL, actualURL)
+		t.Fatalf("Unexpected TranslationURL. Want: %q. Got: %q.", expectedURL, actualURL)
 	}
 }
 
 func TestRouterLanguageNamesURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "http://api.microsofttranslator.com/v2/Http.svc/GetLanguageNames"
+	expectedURL := "https://api.microsofttranslator.com/v2/Http.svc/GetLanguageNames"
 
 	actualURL := router.LanguageNamesURL()
 
 	if actualURL != expectedURL {
-		t.Fatalf("Unexpected AuthURL. Want: '%s'. Got: '%s'.", expectedURL, actualURL)
+		t.Fatalf("Unexpected LanguageNamesURL. Want: %q. Got: %q.", expectedURL, actualURL)
 	}
 }
 
 func TestRouterLanguageCodesURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "http://api.microsofttranslator.com/v2/Http.svc/GetLanguagesForTranslate"
+	expectedURL := "https://api.microsofttranslator.com/v2/Http.svc/GetLanguagesForTranslate"
 
 	actualURL := router.LanguageCodesURL()
 
 	if actualURL != expectedURL {
-		t.Fatalf("Unexpected AuthURL. Want: '%s'. Got: '%s'.", expectedURL, actualURL)
+		t.Fatalf("Unexpected LanguageCodesURL. Want: %q. Got: %q.", expectedURL, actualURL)
 	}
 }
 

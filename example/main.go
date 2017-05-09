@@ -9,9 +9,10 @@ import (
 )
 
 // Instantiates a translator that is backed by the Microsoft Translation API and passes it to helloWorld.
-// Get your own clientId and clientSecret by registering an app with Microsoft's Azure DataMarket (see http://goo.gl/DJtCGy)
+// Get your own subscription key by registering a Microsoft Text Translation service in Azure.
+// See http://docs.microsofttranslator.com/text-translate.html.
 func main() {
-	translator := microsoft.NewTranslator("your-client-id", "your-client-secret")
+	translator := microsoft.NewTranslator("your-subscription-key")
 	helloWorld(translator)
 }
 

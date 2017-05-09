@@ -5,7 +5,7 @@ Translator
 ==========
 
 Go package for easy access to 
-[Microsoft Translator API](http://msdn.microsoft.com/en-us/library/ff512423.aspx) and 
+[Microsoft Text Translation API](http://docs.microsofttranslator.com/text-translate.html) and
 [Google Translate API](https://cloud.google.com/translate/docs).
 
 ## Installation
@@ -16,11 +16,10 @@ go get github.com/st3v/translator
 
 ## Instantiation
 
-### Microsoft Translator API
+### Microsoft Text Translation API
 
-Sign-up for Microsoft Translator API ([see instructions](http://blogs.msdn.com/b/translation/p/gettingstarted1.aspx)) and get your developer credentials. 
-Use the obtained client ID and secret to instantiate a translator as shown
-below.
+Register for Microsoft Text Translation API ([see instructions](http://docs.microsofttranslator.com/text-translate.html)).
+Use the obtained subscription key to instantiate a translator as shown below.
 
 ```go
 package main
@@ -33,7 +32,7 @@ import (
 )
 
 func main() {
-  translator := microsoft.NewTranslator("YOUR-CLIENT-ID", "YOUR-CLIENT-SECRET")
+  translator := microsoft.NewTranslator("YOUR-SUBSCRIPTION-KEY")
     
   translation, err := translator.Translate("Hello World!", "en", "de")
   if err != nil {

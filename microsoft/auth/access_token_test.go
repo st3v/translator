@@ -1,31 +1,27 @@
 package auth
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
 
 // Make sure the access token expires as expected.
 func TestAccessTokenExpired(t *testing.T) {
-	accessToken := newMockAccessToken(12)
+	accessToken := newMockAccessToken(12 * time.Second)
 	if accessToken.expired() {
 		t.Fatalf("Access token should not have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
 	}
 
-	accessToken = newMockAccessToken(0)
+	accessToken = newMockAccessToken(0 * time.Second)
 	if !accessToken.expired() {
 		t.Fatalf("Access token should have expired. Now: %s. ExpiresAt: %s.", time.Now().String(), accessToken.ExpiresAt.String())
 	}
 }
 
-func newMockAccessToken(expiresIn int) *accessToken {
+func newMockAccessToken(expiresIn time.Duration) *accessToken {
 	return &accessToken{
 		Token:     "token",
-		Type:      "token_type",
-		Scope:     "token_scope",
-		ExpiresIn: fmt.Sprintf("%d", expiresIn),
-		ExpiresAt: time.Now().Add(time.Duration(expiresIn) * time.Second),
+		ExpiresAt: time.Now().Add(expiresIn),
 	}
 }
 

@@ -13,12 +13,12 @@ type api struct {
 // NewTranslator returns a struct that implements the Translator
 // interface by exposing a Translate and a Languages function that
 // are backed by Microsoft's translation API.
-// The function takes the clientID and clientSecret for an existing
-// app registered in Microsoft's Azure DataMarket.
-func NewTranslator(clientID, clientSecret string) translator.Translator {
-	scope := "http://api.microsofttranslator.com"
+// The function takes the subscriptionKey for a registered
+// Text Translation Service. Details on how to get such a key:
+// http://docs.microsofttranslator.com/text-translate.html.
+func NewTranslator(subscriptionKey string) translator.Translator {
 	router := newRouter()
-	authenticator := msauth.NewAuthenticator(clientID, clientSecret, scope, router.AuthURL())
+	authenticator := msauth.NewAuthenticator(subscriptionKey, router.AuthURL())
 	return &api{
 		languageCatalog:     newLanguageCatalog(newLanguageProvider(authenticator, router)),
 		translationProvider: newTranslationProvider(authenticator, router),

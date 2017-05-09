@@ -12,15 +12,15 @@ type authenticator struct {
 	accessTokenChan     chan *accessToken
 }
 
-// NewAuthenticator returns an autheticator for Microsoft API endpoints.
-func NewAuthenticator(clientID, clientSecret, scope, authURL string) _http.Authenticator {
+// NewAuthenticator returns an authenticator for Microsoft API endpoints.
+func NewAuthenticator(subscriptionKey, authURL string) _http.Authenticator {
 	// make buffered accessToken channel and pre-fill it with an expired token
 	tokenChan := make(chan *accessToken, 1)
-	tokenChan <- newAccessToken(scope)
+	tokenChan <- new(accessToken)
 
 	// return new authenticator that uses the above accessToken channel
 	return &authenticator{
-		accessTokenProvider: newAccessTokenProvider(clientID, clientSecret, authURL),
+		accessTokenProvider: newAccessTokenProvider(subscriptionKey, authURL),
 		accessTokenChan:     tokenChan,
 	}
 }

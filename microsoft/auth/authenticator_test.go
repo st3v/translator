@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 	"testing"
+	"time"
 )
 
 // Make sure a valid authToken is being generated from a given access token.
@@ -24,7 +25,7 @@ func TestAuthenticatorAuthToken(t *testing.T) {
 
 // Make sure Authenticate() correctly sets the authrorization header of a given request.
 func TestAuthenticatorAuthenticate(t *testing.T) {
-	authenticator := newMockAuthenticator(newMockAccessToken(100))
+	authenticator := newMockAuthenticator(newMockAccessToken(10 * time.Minute))
 
 	authToken, err := authenticator.authToken()
 	if err != nil {
@@ -56,7 +57,7 @@ func TestAuthenticatorConcurrentAuthenticate(t *testing.T) {
 	provider := newMockAccessTokenProvider()
 	provider.refreshToken = func(token *accessToken) error {
 		callCount++
-		*token = *newMockAccessToken(100)
+		*token = *newMockAccessToken(10 * time.Minute)
 		return nil
 	}
 

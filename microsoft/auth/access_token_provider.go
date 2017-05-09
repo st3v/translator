@@ -14,16 +14,14 @@ type AccessTokenProvider interface {
 }
 
 type accessTokenProvider struct {
-	clientID     string
-	clientSecret string
-	authURL      string
+	key     string
+	authURL string
 }
 
-func newAccessTokenProvider(clientID, clientSecret, authURL string) AccessTokenProvider {
+func newAccessTokenProvider(subscribtionKey, authURL string) AccessTokenProvider {
 	return &accessTokenProvider{
-		clientID:     clientID,
-		clientSecret: clientSecret,
-		authURL:      authURL,
+		key:     subscribtionKey,
+		authURL: authURL,
 	}
 }
 
@@ -32,27 +30,28 @@ func (p *accessTokenProvider) RefreshToken(token *accessToken) error {
 	if err != nil {
 		return tracerr.Wrap(err)
 	}
-	req.Header.Add("Ocp-Apim-Subscription-Key", p.clientSecret)
 
-	client := &http.Client{}
+	req.Header.Add("Ocp-Apim-Subscription-Key", p.key)
+
+	client := new(http.Client)
+
 	response, err := client.Do(req)
 	if err != nil {
 		return tracerr.Wrap(err)
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		return tracerr.Errorf("Unexpected Status: %s", response.Status)
 	}
 
+	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return tracerr.Wrap(err)
 	}
 
 	token.Token = string(body)
-
-	token.ExpiresAt = time.Now().Add(8 * time.Minute)
+	token.ExpiresAt = time.Now().Add(10 * time.Minute)
 
 	return nil
 }
