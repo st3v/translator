@@ -2,11 +2,12 @@ package microsoft
 
 const (
 	authURL          = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
-	serviceURL       = "https://api.microsofttranslator.com/v2/Http.svc/"
+	serviceURL       = "https://api.cognitive.microsofttranslator.com/"
 	translationURL   = serviceURL + "Translate"
 	detectURL        = serviceURL + "Detect"
 	languageNamesURL = serviceURL + "GetLanguageNames"
 	languageCodesURL = serviceURL + "GetLanguagesForTranslate"
+	apiVersion       = "3.0"
 )
 
 // The Router provides necessary URLs to communicate with
@@ -17,6 +18,7 @@ type Router interface {
 	DetectURL() string
 	LanguageNamesURL() string
 	LanguageCodesURL() string
+	ApiVersion() string
 }
 
 type router struct{}
@@ -43,4 +45,8 @@ func (r *router) LanguageNamesURL() string {
 
 func (r *router) LanguageCodesURL() string {
 	return languageCodesURL
+}
+
+func (r *router) ApiVersion() string {
+	return apiVersion
 }
