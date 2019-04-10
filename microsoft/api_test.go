@@ -11,12 +11,13 @@ func TestAPITranslate(t *testing.T) {
 	expectedTranslation := "My English is under all pig."
 	from := "de"
 	to := "en"
+	version := "3.0"
 
 	api := &api{
 		translationProvider: newMockTranslationProvider(original, from, to, expectedTranslation, t),
 	}
 
-	actualTranslation, err := api.Translate(original, from, to)
+	actualTranslation, err := api.Translate(original, from, to, version)
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
 	}
@@ -72,12 +73,13 @@ func TestAPIDetect(t *testing.T) {
 	text := "Mein Englisch ist unter aller Sau."
 	expectedLanguage := "de"
 	from := "de"
+	version := "3.0"
 
 	api := &api{
 		translationProvider: newMockTranslationProvider(text, from, "", "", t),
 	}
 
-	actualLanguage, err := api.Detect(text)
+	actualLanguage, err := api.Detect(text, version)
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
 	}

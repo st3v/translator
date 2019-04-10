@@ -22,10 +22,10 @@ func (a *api) Languages() ([]translator.Language, error) {
 	return a.lp.languages()
 }
 
-func (a *api) Detect(text string) (string, error) {
+func (a *api) Detect(text, version string) (string, error) {
 	return a.lp.detect(text)
 }
 
-func (a *api) Translate(text, from, to string) (string, error) {
+func (a *api) Translate(text, from, to, version string) (string, error) {
 	return a.tp.translate(text, from, to)
 }

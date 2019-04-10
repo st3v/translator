@@ -15,6 +15,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 	expectedTranslation := "I only understand train station."
 	expectedFrom := "de"
 	expectedTo := "en"
+	expectedVersion := "3.0"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -37,6 +38,10 @@ func TestTranslationProviderTranslate(t *testing.T) {
 			t.Fatalf("Unexpected `from` param in request: %s", r.FormValue("from"))
 		}
 
+		if r.FormValue("version") != expectedVersion {
+			t.Fatalf("Unexpected `version` param in request: %s", r.FormValue("version"))
+		}
+
 		response, err := xml.Marshal(newXMLString(expectedTranslation))
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
@@ -57,7 +62,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 		httpClient: _http.NewAuthenticatedClient(),
 	}
 
-	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo)
+	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo, expectedVersion)
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err.Error())
 	}
@@ -70,6 +75,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 func TestTranslationProviderDetect(t *testing.T) {
 	text := "Ich verstehe nur Bahnhof."
 	expectedLanguage := "de"
+	version := "3.0"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -104,7 +110,7 @@ func TestTranslationProviderDetect(t *testing.T) {
 		httpClient: _http.NewAuthenticatedClient(),
 	}
 
-	actualLanguage, err := translationProvider.Detect(text)
+	actualLanguage, err := translationProvider.Detect(text, version)
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err.Error())
 	}
@@ -132,7 +138,7 @@ type mockTranslationProvider struct {
 	t           *testing.T
 }
 
-func (p *mockTranslationProvider) Translate(text, from, to string) (string, error) {
+func (p *mockTranslationProvider) Translate(text, from, to, version string) (string, error) {
 	if p.text != text {
 		p.t.Fatalf("Unexpected text value: `%s`", text)
 	}
@@ -147,6 +153,6 @@ func (p *mockTranslationProvider) Translate(text, from, to string) (string, erro
 	return p.translation, nil
 }
 
-func (p *mockTranslationProvider) Detect(text string) (string, error) {
+func (p *mockTranslationProvider) Detect(text, version string) (string, error) {
 	return p.from, nil
 }
