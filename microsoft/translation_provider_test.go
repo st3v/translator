@@ -1,7 +1,7 @@
 package microsoft
 
 import (
-	"encoding/xml"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -18,16 +18,12 @@ func TestTranslationProviderTranslate(t *testing.T) {
 	expectedVersion := "3.0"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
+		if r.Method != "POST" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
 		}
 
-		if r.Header.Get("Content-Type") != "text/plain" {
+		if r.Header.Get("Content-Type") != "application/json" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
-		}
-
-		if r.FormValue("text") != expectedOriginal {
-			t.Fatalf("Unexpected `text` param in request: %s", r.FormValue("text"))
 		}
 
 		if r.FormValue("to") != expectedTo {
@@ -38,16 +34,15 @@ func TestTranslationProviderTranslate(t *testing.T) {
 			t.Fatalf("Unexpected `from` param in request: %s", r.FormValue("from"))
 		}
 
-		if r.FormValue("version") != expectedVersion {
-			t.Fatalf("Unexpected `version` param in request: %s", r.FormValue("version"))
-		}
+		request := make(Request, 1)
+		request[0].Text = expectedTranslation
 
-		response, err := xml.Marshal(newXMLString(expectedTranslation))
+		response, err := json.Marshal(&request)
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
 		}
 
-		w.Header().Set("Content-Type", "text/xml")
+		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Fprint(w, string(response))
 		return
@@ -78,7 +73,7 @@ func TestTranslationProviderDetect(t *testing.T) {
 	version := "3.0"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
+		if r.Method != "POST" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
 		}
 
@@ -86,16 +81,15 @@ func TestTranslationProviderDetect(t *testing.T) {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
 		}
 
-		if r.FormValue("text") != text {
-			t.Fatalf("Unexpected `text` param in request: %s", r.FormValue("text"))
-		}
+		request := make(Request, 1)
+		request[0].Text = expectedLanguage
 
-		response, err := xml.Marshal(newXMLString(expectedLanguage))
+		response, err := json.Marshal(&request)
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
 		}
 
-		w.Header().Set("Content-Type", "text/xml")
+		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Fprint(w, string(response))
 		return

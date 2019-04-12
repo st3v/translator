@@ -5,8 +5,8 @@ const (
 	serviceURL       = "https://api.cognitive.microsofttranslator.com/"
 	translationURL   = serviceURL + "Translate"
 	detectURL        = serviceURL + "Detect"
-	languageNamesURL = serviceURL + "GetLanguageNames"
-	languageCodesURL = serviceURL + "GetLanguagesForTranslate"
+	languageNamesURL = serviceURL + "Languages"
+	languageCodesURL = serviceURL + "Languages"
 	apiVersion       = "3.0"
 )
 
