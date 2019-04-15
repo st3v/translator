@@ -79,12 +79,16 @@ func TestTranslationProviderDetect(t *testing.T) {
 			t.Fatalf("Unexpected request method: %s", r.Method)
 		}
 
-		if r.Header.Get("Content-Type") != "text/plain" {
+		if r.Header.Get("Content-Type") != "application/json" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
 		}
 
-		request := make(Request, 1)
-		request[0].Text = expectedLanguage
+		var request interface{}
+		tr := []byte(`[{"language":"de","score":1.0,"isTranslationSupported":true,"isTransliterationSupported":false,"alternatives":[{"language":"en","score":0.75,"isTranslationSupported":false,"isTransliterationSupported":false},{"language":"pl","score":0.75,"isTranslationSupported":true,"isTransliterationSupported":false}]}]`)
+		err := json.Unmarshal(tr, &request)
+		if err != nil {
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
+		}
 
 		response, err := json.Marshal(&request)
 		if err != nil {
