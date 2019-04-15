@@ -33,10 +33,12 @@ func TestTranslationProviderTranslate(t *testing.T) {
 		if r.FormValue("from") != expectedFrom {
 			t.Fatalf("Unexpected `from` param in request: %s", r.FormValue("from"))
 		}
-
-		request := make(Request, 1)
-		request[0].Text = expectedTranslation
-
+		var request interface{}
+		tr := []byte(`[{"detectedLanguage":{"language": "en","score": 1.0},"translations":[{"text":"I only understand train station.","to": "en"},{"text": "Salve, mondo!","to": "it"}]}]`)
+		err := json.Unmarshal(tr, &request)
+		if err != nil {
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
+		}
 		response, err := json.Marshal(&request)
 		if err != nil {
 			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
