@@ -66,7 +66,7 @@ func (p *translationProvider) Translate(text, from, to, version string) (string,
 	request[0].Text = text
 	b, _ := json.Marshal(&request)
 	uri := fmt.Sprintf(
-		"%s?api-version=%s&from=%s&to=%s",
+		"%s?api-version=%s&from=%s&to=%s&textType=html",
 		p.router.TranslationURL(),
 		apiVer,
 		url.QueryEscape(from),
