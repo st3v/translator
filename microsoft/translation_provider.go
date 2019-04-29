@@ -3,6 +3,7 @@ package microsoft
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/st3v/tracerr"
 	"github.com/st3v/translator/http"
@@ -49,6 +50,14 @@ type Alternatives struct {
 	IsTransliterationSupported bool    `json:"isTransliterationSupported"`
 }
 
+type Errors struct {
+	Error Error `json:"error"`
+}
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 func newTranslationProvider(authenticator http.Authenticator, router Router) TranslationProvider {
 	return &translationProvider{
 		router:     router,
@@ -84,10 +93,17 @@ func (p *translationProvider) Translate(text, from, to, version string) (string,
 		return "", tracerr.Wrap(err)
 	}
 
+	errMsg := Errors{}
+	err = json.Unmarshal(body, &errMsg)
 	translation := Translate{}
-	err = json.Unmarshal(body, &translation)
+
 	if err != nil {
-		return "", tracerr.Wrap(err)
+		err = json.Unmarshal(body, &translation)
+		if err != nil {
+			return "", tracerr.Wrap(err)
+		}
+	} else {
+		return "", errors.New(errMsg.Error.Message)
 	}
 
 	return translation[0].Translations[0].Text, nil
