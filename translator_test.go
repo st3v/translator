@@ -5,7 +5,7 @@ import "testing"
 // Make sure nobody breaks the interface.
 func TestTranslatorInterface(t *testing.T) {
 	var translator Translator = &testTranslator{}
-	translator.Translate("", "", "")
+	translator.Translate("", "", "", "")
 }
 
 type testTranslator struct{}
@@ -14,10 +14,10 @@ func (t *testTranslator) Languages() ([]Language, error) {
 	return nil, nil
 }
 
-func (t *testTranslator) Translate(text, from, to string) (string, error) {
+func (t *testTranslator) Translate(text, from, to, version string) (string, error) {
 	return "", nil
 }
 
-func (t *testTranslator) Detect(text string) (string, error) {
+func (t *testTranslator) Detect(text, version string) (string, error) {
 	return "", nil
 }

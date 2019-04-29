@@ -17,7 +17,7 @@ func TestRouterAuthURL(t *testing.T) {
 func TestRouterTranslationURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "https://api.microsofttranslator.com/v2/Http.svc/Translate"
+	expectedURL := "https://api.cognitive.microsofttranslator.com/Translate"
 
 	actualURL := router.TranslationURL()
 
@@ -29,7 +29,7 @@ func TestRouterTranslationURL(t *testing.T) {
 func TestRouterLanguageNamesURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "https://api.microsofttranslator.com/v2/Http.svc/GetLanguageNames"
+	expectedURL := "https://api.cognitive.microsofttranslator.com/Languages"
 
 	actualURL := router.LanguageNamesURL()
 
@@ -41,7 +41,7 @@ func TestRouterLanguageNamesURL(t *testing.T) {
 func TestRouterLanguageCodesURL(t *testing.T) {
 	router := newRouter()
 
-	expectedURL := "https://api.microsofttranslator.com/v2/Http.svc/GetLanguagesForTranslate"
+	expectedURL := "https://api.cognitive.microsofttranslator.com/Languages"
 
 	actualURL := router.LanguageCodesURL()
 
@@ -66,6 +66,7 @@ type mockRouter struct {
 	languageNamesURL string
 	languageCodesURL string
 	detectURL        string
+	apiVersion       string
 }
 
 func (m *mockRouter) AuthURL() string {
@@ -86,4 +87,8 @@ func (m *mockRouter) LanguageCodesURL() string {
 
 func (m *mockRouter) DetectURL() string {
 	return m.detectURL
+}
+
+func (m *mockRouter) ApiVersion() string {
+	return m.apiVersion
 }

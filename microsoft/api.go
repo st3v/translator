@@ -25,14 +25,14 @@ func NewTranslator(subscriptionKey string) translator.Translator {
 	}
 }
 
-func (a *api) Translate(text, from, to string) (string, error) {
-	return a.translationProvider.Translate(text, from, to)
+func (a *api) Translate(text, from, to, version string) (string, error) {
+	return a.translationProvider.Translate(text, from, to, version)
 }
 
 func (a *api) Languages() ([]translator.Language, error) {
 	return a.languageCatalog.Languages()
 }
 
-func (a *api) Detect(text string) (string, error) {
-	return a.translationProvider.Detect(text)
+func (a *api) Detect(text, version string) (string, error) {
+	return a.translationProvider.Detect(text, version)
 }

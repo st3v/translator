@@ -1,7 +1,7 @@
 package microsoft
 
 import (
-	"encoding/xml"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -15,18 +15,15 @@ func TestTranslationProviderTranslate(t *testing.T) {
 	expectedTranslation := "I only understand train station."
 	expectedFrom := "de"
 	expectedTo := "en"
+	expectedVersion := "3.0"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
+		if r.Method != "POST" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
 		}
 
-		if r.Header.Get("Content-Type") != "text/plain" {
+		if r.Header.Get("Content-Type") != "application/json" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
-		}
-
-		if r.FormValue("text") != expectedOriginal {
-			t.Fatalf("Unexpected `text` param in request: %s", r.FormValue("text"))
 		}
 
 		if r.FormValue("to") != expectedTo {
@@ -36,13 +33,18 @@ func TestTranslationProviderTranslate(t *testing.T) {
 		if r.FormValue("from") != expectedFrom {
 			t.Fatalf("Unexpected `from` param in request: %s", r.FormValue("from"))
 		}
-
-		response, err := xml.Marshal(newXMLString(expectedTranslation))
+		var request interface{}
+		tr := []byte(`[{"detectedLanguage":{"language": "en","score": 1.0},"translations":[{"text":"I only understand train station.","to": "en"},{"text": "Salve, mondo!","to": "it"}]}]`)
+		err := json.Unmarshal(tr, &request)
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
+		}
+		response, err := json.Marshal(&request)
+		if err != nil {
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
 		}
 
-		w.Header().Set("Content-Type", "text/xml")
+		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Fprint(w, string(response))
 		return
@@ -57,7 +59,7 @@ func TestTranslationProviderTranslate(t *testing.T) {
 		httpClient: _http.NewAuthenticatedClient(),
 	}
 
-	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo)
+	actualTranslation, err := translationProvider.Translate(expectedOriginal, expectedFrom, expectedTo, expectedVersion)
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err.Error())
 	}
@@ -70,26 +72,30 @@ func TestTranslationProviderTranslate(t *testing.T) {
 func TestTranslationProviderDetect(t *testing.T) {
 	text := "Ich verstehe nur Bahnhof."
 	expectedLanguage := "de"
+	version := "3.0"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
+		if r.Method != "POST" {
 			t.Fatalf("Unexpected request method: %s", r.Method)
 		}
 
-		if r.Header.Get("Content-Type") != "text/plain" {
+		if r.Header.Get("Content-Type") != "application/json" {
 			t.Fatalf("Unexpected content type in request header: %s", r.Header.Get("Content-Type"))
 		}
 
-		if r.FormValue("text") != text {
-			t.Fatalf("Unexpected `text` param in request: %s", r.FormValue("text"))
-		}
-
-		response, err := xml.Marshal(newXMLString(expectedLanguage))
+		var request interface{}
+		tr := []byte(`[{"language":"de","score":1.0,"isTranslationSupported":true,"isTransliterationSupported":false,"alternatives":[{"language":"en","score":0.75,"isTranslationSupported":false,"isTransliterationSupported":false},{"language":"pl","score":0.75,"isTranslationSupported":true,"isTransliterationSupported":false}]}]`)
+		err := json.Unmarshal(tr, &request)
 		if err != nil {
-			t.Fatalf("Unexpected error marshalling xml repsonse: %s", err.Error())
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
 		}
 
-		w.Header().Set("Content-Type", "text/xml")
+		response, err := json.Marshal(&request)
+		if err != nil {
+			t.Fatalf("Unexpected error marshalling json response: %s", err.Error())
+		}
+
+		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Fprint(w, string(response))
 		return
@@ -104,7 +110,7 @@ func TestTranslationProviderDetect(t *testing.T) {
 		httpClient: _http.NewAuthenticatedClient(),
 	}
 
-	actualLanguage, err := translationProvider.Detect(text)
+	actualLanguage, err := translationProvider.Detect(text, version)
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err.Error())
 	}
@@ -132,7 +138,7 @@ type mockTranslationProvider struct {
 	t           *testing.T
 }
 
-func (p *mockTranslationProvider) Translate(text, from, to string) (string, error) {
+func (p *mockTranslationProvider) Translate(text, from, to, version string) (string, error) {
 	if p.text != text {
 		p.t.Fatalf("Unexpected text value: `%s`", text)
 	}
@@ -147,6 +153,6 @@ func (p *mockTranslationProvider) Translate(text, from, to string) (string, erro
 	return p.translation, nil
 }
 
-func (p *mockTranslationProvider) Detect(text string) (string, error) {
+func (p *mockTranslationProvider) Detect(text, version string) (string, error) {
 	return p.from, nil
 }

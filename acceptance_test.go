@@ -54,7 +54,7 @@ func microsoftTranslator(t *testing.T) translator.Translator {
 }
 
 func testTranslate(t *testing.T, translator translator.Translator) {
-	translation, err := translator.Translate("Hello World!", "en", "de")
+	translation, err := translator.Translate("Hello World!", "en", "de", "3.0")
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
@@ -72,7 +72,7 @@ func testTranslate(t *testing.T, translator translator.Translator) {
 }
 
 func testDetect(t *testing.T, translator translator.Translator) {
-	languageCode, err := translator.Detect("¿cómo está?")
+	languageCode, err := translator.Detect("¿cómo está?", "3.0")
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())

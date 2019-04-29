@@ -29,7 +29,7 @@ func helloWorld(t translator.Translator) {
 
 	translations := make([]<-chan string, len(languages))
 	for i, language := range languages {
-		translations[i] = translate(t, "Hello World!", "en", language)
+		translations[i] = translate(t, "Hello World!", "en", language, "")
 	}
 
 	for n := range mergeChannels(translations) {
@@ -39,10 +39,10 @@ func helloWorld(t translator.Translator) {
 
 // Starts a go routine to translate text for a particular language. Returns a channel that will be
 // used to send either the translation or an error string if something went wrong.
-func translate(t translator.Translator, text, from string, to translator.Language) <-chan string {
+func translate(t translator.Translator, text, from string, to translator.Language, version string) <-chan string {
 	out := make(chan string)
 	go func() {
-		translation, err := t.Translate(text, from, to.Code)
+		translation, err := t.Translate(text, from, to.Code, version)
 		if err != nil {
 			out <- fmt.Sprintf("Error during translation for %s: %s", to.Name, err.Error())
 		} else {
